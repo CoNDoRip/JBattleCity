@@ -1,20 +1,22 @@
 package ua.pp.condor.jbattlecity;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-
 import javax.swing.JApplet;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+
+import ua.pp.condor.jbattlecity.area.Area;
 
 public class JBattleCity extends JApplet {
 
-    @Override
+	private static final long serialVersionUID = -6680546851758395165L;
+	
+	public static final int WIDTH = 520;
+	public static final int HEIGHT = 520;
+
+	@Override
     public void init() {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
 
-                @Override
                 public void run() {
                     makeGUI();
                 }
@@ -25,17 +27,8 @@ public class JBattleCity extends JApplet {
     }
 
     private void makeGUI() {
-        GridBagLayout gBag = new GridBagLayout();
-        setLayout(gBag);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.weighty = 1.0;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.anchor = GridBagConstraints.NORTH;
-
-        JLabel head = new JLabel("JBattleCity");
-        gBag.setConstraints(head, gbc);
-        add(head);
+    	setSize(WIDTH, HEIGHT);
+        add(new Area());
     }
 
 }
