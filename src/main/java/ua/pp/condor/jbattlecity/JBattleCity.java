@@ -4,6 +4,7 @@ import javax.swing.JApplet;
 import javax.swing.SwingUtilities;
 
 import ua.pp.condor.jbattlecity.area.Area;
+import ua.pp.condor.jbattlecity.area.maps.Stage1;
 
 public class JBattleCity extends JApplet {
 
@@ -28,7 +29,7 @@ public class JBattleCity extends JApplet {
 
     private void makeGUI() {
     	setSize(WIDTH, HEIGHT);
-        add(new Area());
+        add(new Area(new Stage1()));
     }
 
 }

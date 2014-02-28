@@ -1,6 +1,9 @@
 package ua.pp.condor.jbattlecity.area.maps;
 
+import java.awt.Image;
+
 import ua.pp.condor.jbattlecity.area.Cell;
+import ua.pp.condor.jbattlecity.utils.Images;
 
 public class Stage1 implements IMap {
 	
@@ -71,11 +74,18 @@ public class Stage1 implements IMap {
         {Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.wall,  Cell.wall,     Cell.base,  Cell.base,  Cell.base,  Cell.base,     Cell.wall,  Cell.wall,  Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty},
         {Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.wall,  Cell.wall,     Cell.base,  Cell.base,  Cell.base,  Cell.base,     Cell.wall,  Cell.wall,  Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty},
 	};
-	
-	public static final String IMG = "/img/stage1.gif";
 
 	public Cell getCell(int x, int y) {
 		return map[y][x];
+	}
+	
+	private Image mapImage;
+	
+	public Image getMapImage() {
+		if (mapImage == null) {
+			mapImage = Images.getImage(Images.STAGE_1);
+		}
+		return mapImage;
 	}
 
 }
