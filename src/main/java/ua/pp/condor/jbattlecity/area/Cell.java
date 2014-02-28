@@ -7,8 +7,7 @@ public enum Cell {
 	empty(Color.BLACK),
 	wall(Color.RED),
 	conc(Color.WHITE), //concrete
-	base(Color.GRAY),
-	tank(Color.GREEN);
+	base(Color.GRAY);
 	
 	private Color color;
 	
