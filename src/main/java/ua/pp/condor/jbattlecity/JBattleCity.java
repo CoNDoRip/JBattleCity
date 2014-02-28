@@ -29,7 +29,7 @@ public class JBattleCity extends JApplet {
 
     private void makeGUI() {
     	setSize(WIDTH, HEIGHT);
-        add(new Area(new Stage1()));
+    	add(new Area(new Stage1()));
     }
 
 }
