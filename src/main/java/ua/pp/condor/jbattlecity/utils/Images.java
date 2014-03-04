@@ -7,13 +7,19 @@ import javax.imageio.ImageIO;
 
 public class Images {
 	
-	public static final String STAGE_1 = "/img/stage1.gif";
+	private static final String STAGE_1 = "/img/stage_1.gif";
 	
-	public static final String YOU = "/img/you.gif";
-	public static final String YOU_UP = "/img/you_up.gif";
-	public static final String YOU_DOWN = "/img/you_down.gif";
-	public static final String YOU_LEFT = "/img/you_left.gif";
-	public static final String YOU_RIGHT = "/img/you_right.gif";
+	private static final String YOU_UP    = "/img/you_up.gif";
+	private static final String YOU_RIGHT = "/img/you_right.gif";
+	private static final String YOU_DOWN  = "/img/you_down.gif";
+	private static final String YOU_LEFT  = "/img/you_left.gif";
+
+	private static Image stage1;
+	
+	private static Image youUp;
+	private static Image youRight;
+	private static Image youDown;
+	private static Image youLeft;
 	
 	public static Image getImage(String name) {
 		Image image = null;
@@ -23,6 +29,36 @@ public class Images {
 			e.printStackTrace();
 		}
 		return image;
+	}
+	
+	public static Image getStage1() {
+		if (stage1 == null)
+			stage1 = getImage(STAGE_1);
+		return stage1;
+	}
+	
+	public static Image getYouUp() {
+		if (youUp == null)
+			youUp = getImage(YOU_UP);
+		return youUp;
+	}
+	
+	public static Image getYouRight() {
+		if (youRight == null)
+			youRight = getImage(YOU_RIGHT);
+		return youRight;
+	}
+	
+	public static Image getYouDown() {
+		if (youDown == null)
+			youDown = getImage(YOU_DOWN);
+		return youDown;
+	}
+	
+	public static Image getYouLeft() {
+		if (youLeft == null)
+			youLeft = getImage(YOU_LEFT);
+		return youLeft;
 	}
 
 }

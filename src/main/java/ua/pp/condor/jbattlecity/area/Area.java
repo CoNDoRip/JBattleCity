@@ -2,9 +2,9 @@ package ua.pp.condor.jbattlecity.area;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -21,11 +21,6 @@ public class Area extends JPanel {
 	private static final long serialVersionUID = -2993932675117489481L;
 	
 	private MapState mapState;
-	
-	private Image youUp;
-	private Image youRight;
-	private Image youDown;
-	private Image youLeft;
 	
 	public Area(IMap map) {
 		mapState = new MapState(map);
@@ -101,10 +96,20 @@ public class Area extends JPanel {
 			}
 		});
         
-        youUp = Images.getImage(Images.YOU_UP);
-        youRight = Images.getImage(Images.YOU_RIGHT);
-        youDown = Images.getImage(Images.YOU_DOWN);
-        youLeft = Images.getImage(Images.YOU_LEFT);
+        MediaTracker mt = new MediaTracker(this);
+        mt.addImage(mapState.getMapImage(), 1);
+        mt.addImage(Images.getYouUp(), 2);
+        mt.addImage(Images.getYouRight(), 2);
+        mt.addImage(Images.getYouDown(), 2);
+        mt.addImage(Images.getYouLeft(), 2);
+        
+        try {
+			mt.waitForAll();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+        if (mt.isErrorAny())
+        	throw new IllegalStateException("Errors in images loading");
 	}
 
 	@Override
@@ -122,10 +127,10 @@ public class Area extends JPanel {
 		}
         
         switch(mapState.getTankOrientation()) {
-    		case UP:    g.drawImage(youUp,    mapState.getTankX(), mapState.getTankY(), this); break;
-        	case RIGHT: g.drawImage(youRight, mapState.getTankX(), mapState.getTankY(), this); break;
-        	case DOWN:  g.drawImage(youDown,  mapState.getTankX(), mapState.getTankY(), this); break;
-        	case LEFT:  g.drawImage(youLeft,  mapState.getTankX(), mapState.getTankY(), this); break;
+    		case UP:    g.drawImage(Images.getYouUp(),    mapState.getTankX(), mapState.getTankY(), this); break;
+        	case RIGHT: g.drawImage(Images.getYouRight(), mapState.getTankX(), mapState.getTankY(), this); break;
+        	case DOWN:  g.drawImage(Images.getYouDown(),  mapState.getTankX(), mapState.getTankY(), this); break;
+        	case LEFT:  g.drawImage(Images.getYouLeft(),  mapState.getTankX(), mapState.getTankY(), this); break;
         }
     }
 	

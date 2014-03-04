@@ -79,13 +79,8 @@ public class Stage1 implements IMap {
 		return map[y][x];
 	}
 	
-	private Image mapImage;
-	
 	public Image getMapImage() {
-		if (mapImage == null) {
-			mapImage = Images.getImage(Images.STAGE_1);
-		}
-		return mapImage;
+		return Images.getStage1();
 	}
 
 }
