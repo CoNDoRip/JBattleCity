@@ -16,7 +16,11 @@ public class MapState implements IMap {
 	
 	private IMap map;
 	
-	public void init(IMap map) {
+	private int tankX = 160;
+	private int tankY = 480;
+	private Orientation tankOrientation = Orientation.UP;
+	
+	public MapState(IMap map) {
 		this.map = map;
 		for (int x = 0; x < ARRAY_SIZE; x++) {
 			for (int y = 0; y < ARRAY_SIZE; y++) {
@@ -31,6 +35,30 @@ public class MapState implements IMap {
 	
 	public Image getMapImage() {
 		return map.getMapImage();
+	}
+
+	public int getTankX() {
+		return tankX;
+	}
+
+	public void setTankX(int tankX) {
+		this.tankX = tankX;
+	}
+
+	public int getTankY() {
+		return tankY;
+	}
+
+	public void setTankY(int tankY) {
+		this.tankY = tankY;
+	}
+
+	public Orientation getTankOrientation() {
+		return tankOrientation;
+	}
+
+	public void setTankOrientation(Orientation tankOrientation) {
+		this.tankOrientation = tankOrientation;
 	}
 
 }
