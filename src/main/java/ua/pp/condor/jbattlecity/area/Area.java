@@ -14,7 +14,9 @@ import javax.swing.Timer;
 
 import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
+import ua.pp.condor.jbattlecity.tank.ItemState;
 import ua.pp.condor.jbattlecity.tank.Orientation;
+import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.utils.Images;
 
@@ -40,7 +42,7 @@ public class Area extends JPanel {
         	.addKeyEventDispatcher(new KeyEventDispatcher() {
 			
 			public boolean dispatchKeyEvent(KeyEvent arg0) {
-				final int delta = 10;
+				final int delta = 5;
 				
 				TankState you = mapState.getYou();
 				
@@ -54,7 +56,7 @@ public class Area extends JPanel {
 				int incYCell = (tankY + delta) / 10;
 				int decYCell = (tankY - delta) / 10;
 				
-				switch(arg0.getKeyCode()) {
+				switch (arg0.getKeyCode()) {
 					case KeyEvent.VK_UP: {
 						you.setOrientation(Orientation.UP);
 						if (tankY - delta >= 0
@@ -91,6 +93,36 @@ public class Area extends JPanel {
 						}
 						break;
 					}
+					case KeyEvent.VK_CAPS_LOCK: {
+						ProjectileState ps = new ProjectileState();
+						switch (you.getOrientation()) {
+							case UP: {
+								ps.setX(you.getX() + 20 - 3);
+								ps.setY(you.getY() - 3);
+								ps.setOrientation(Orientation.UP);
+								break;
+							}
+							case RIGHT: {
+								ps.setX(you.getX() + 40 - 3);
+								ps.setY(you.getY() + 20 - 3);
+								ps.setOrientation(Orientation.RIGHT);
+								break;
+							}
+							case DOWN: {
+								ps.setX(you.getX() + 20 - 3);
+								ps.setY(you.getY() + 40 - 3);
+								ps.setOrientation(Orientation.DOWN);
+								break;
+							}
+							case LEFT: {
+								ps.setX(you.getX() - 3);
+								ps.setY(you.getY() + 20 - 3);
+								ps.setOrientation(Orientation.LEFT);
+								break;
+							}
+						}
+						mapState.addProjectile(ps);
+					}
 				}
 				
 				you.setX(tankX);
@@ -107,6 +139,7 @@ public class Area extends JPanel {
         mt.addImage(Images.getYouRight(), 2);
         mt.addImage(Images.getYouDown(), 2);
         mt.addImage(Images.getYouLeft(), 2);
+        mt.addImage(Images.getProjectile(), 3);
         
         try {
 			mt.waitForAll();
@@ -131,12 +164,16 @@ public class Area extends JPanel {
 			}
 		}
         
-        TankState you = mapState.getYou();
-        switch(you.getOrientation()) {
+        ItemState you = mapState.getYou();
+        switch (you.getOrientation()) {
     		case UP:    g.drawImage(Images.getYouUp(),    you.getX(), you.getY(), this); break;
         	case RIGHT: g.drawImage(Images.getYouRight(), you.getX(), you.getY(), this); break;
         	case DOWN:  g.drawImage(Images.getYouDown(),  you.getX(), you.getY(), this); break;
         	case LEFT:  g.drawImage(Images.getYouLeft(),  you.getX(), you.getY(), this); break;
+        }
+        
+        for (ProjectileState ps : mapState.getProjectiles()) {
+        	g.drawImage(Images.getProjectile(), ps.getX(), ps.getY(), this);
         }
     }
 	

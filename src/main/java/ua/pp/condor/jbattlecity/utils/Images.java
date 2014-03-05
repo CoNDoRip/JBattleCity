@@ -13,6 +13,8 @@ public class Images {
 	private static final String YOU_RIGHT = "/img/you_right.gif";
 	private static final String YOU_DOWN  = "/img/you_down.gif";
 	private static final String YOU_LEFT  = "/img/you_left.gif";
+	
+	private static final String PROJECTILE  = "/img/projectile.gif";
 
 	private static Image stage1;
 	
@@ -20,6 +22,8 @@ public class Images {
 	private static Image youRight;
 	private static Image youDown;
 	private static Image youLeft;
+	
+	private static Image projectile;
 	
 	public static Image getImage(String name) {
 		Image image = null;
@@ -59,6 +63,12 @@ public class Images {
 		if (youLeft == null)
 			youLeft = getImage(YOU_LEFT);
 		return youLeft;
+	}
+
+	public static Image getProjectile() {
+		if (projectile == null)
+			projectile = getImage(PROJECTILE);
+		return projectile;
 	}
 
 }
