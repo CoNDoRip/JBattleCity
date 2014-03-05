@@ -42,92 +42,94 @@ public class Area extends JPanel {
         	.addKeyEventDispatcher(new KeyEventDispatcher() {
 			
 			public boolean dispatchKeyEvent(KeyEvent arg0) {
-				final int delta = 5;
-				
-				TankState you = mapState.getYou();
-				
-				int tankX = you.getX();
-				int tankY = you.getY();
-				
-				int oldXCell =  tankX / 10;
-				int incXCell = (tankX + delta) / 10;
-				int decXCell = (tankX - delta) / 10;
-				int oldYCell =  tankY / 10;
-				int incYCell = (tankY + delta) / 10;
-				int decYCell = (tankY - delta) / 10;
-				
-				switch (arg0.getKeyCode()) {
-					case KeyEvent.VK_UP: {
-						you.setOrientation(Orientation.UP);
-						if (tankY - delta >= 0
-								&& mapState.getCell(oldXCell, decYCell) == Cell.empty
-								&& mapState.getCell(oldXCell + 3, decYCell) == Cell.empty) {
-							tankY -= delta;
-						}
-						break;
-					}
-					case KeyEvent.VK_LEFT: {
-						you.setOrientation(Orientation.LEFT);
-						if (tankX - delta >= 0
-								&& mapState.getCell(decXCell, oldYCell) == Cell.empty
-								&& mapState.getCell(decXCell, oldYCell + 3) == Cell.empty) {
-							tankX -= delta;
-						}
-						break;
-					}
-					case KeyEvent.VK_DOWN: {
-						you.setOrientation(Orientation.DOWN);
-						if (tankY + delta <= JBattleCity.WIDTH - 40
-								&& mapState.getCell(oldXCell, incYCell + 3) == Cell.empty
-								&& mapState.getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
-							tankY += delta;
-						}
-						break;
-					}
-					case KeyEvent.VK_RIGHT: {
-						you.setOrientation(Orientation.RIGHT);
-						if (tankX + delta <= JBattleCity.HEIGHT - 40
-								&& mapState.getCell(incXCell + 3, oldYCell) == Cell.empty
-								&& mapState.getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
-							tankX += delta;
-						}
-						break;
-					}
-					case KeyEvent.VK_CAPS_LOCK: {
-						ProjectileState ps = new ProjectileState();
-						switch (you.getOrientation()) {
-							case UP: {
-								ps.setX(you.getX() + 20 - 3);
-								ps.setY(you.getY() - 3);
-								ps.setOrientation(Orientation.UP);
-								break;
+				if (arg0.getID() == KeyEvent.KEY_PRESSED) {
+					final int delta = 5;
+					
+					TankState you = mapState.getYou();
+					
+					int tankX = you.getX();
+					int tankY = you.getY();
+					
+					int oldXCell =  tankX / 10;
+					int incXCell = (tankX + delta) / 10;
+					int decXCell = (tankX - delta) / 10;
+					int oldYCell =  tankY / 10;
+					int incYCell = (tankY + delta) / 10;
+					int decYCell = (tankY - delta) / 10;
+					
+					switch (arg0.getKeyCode()) {
+						case KeyEvent.VK_UP: {
+							you.setOrientation(Orientation.UP);
+							if (tankY - delta >= 0
+									&& mapState.getCell(oldXCell, decYCell) == Cell.empty
+									&& mapState.getCell(oldXCell + 3, decYCell) == Cell.empty) {
+								tankY -= delta;
 							}
-							case RIGHT: {
-								ps.setX(you.getX() + 40 - 3);
-								ps.setY(you.getY() + 20 - 3);
-								ps.setOrientation(Orientation.RIGHT);
-								break;
-							}
-							case DOWN: {
-								ps.setX(you.getX() + 20 - 3);
-								ps.setY(you.getY() + 40 - 3);
-								ps.setOrientation(Orientation.DOWN);
-								break;
-							}
-							case LEFT: {
-								ps.setX(you.getX() - 3);
-								ps.setY(you.getY() + 20 - 3);
-								ps.setOrientation(Orientation.LEFT);
-								break;
-							}
+							break;
 						}
-						mapState.addProjectile(ps);
+						case KeyEvent.VK_LEFT: {
+							you.setOrientation(Orientation.LEFT);
+							if (tankX - delta >= 0
+									&& mapState.getCell(decXCell, oldYCell) == Cell.empty
+									&& mapState.getCell(decXCell, oldYCell + 3) == Cell.empty) {
+								tankX -= delta;
+							}
+							break;
+						}
+						case KeyEvent.VK_DOWN: {
+							you.setOrientation(Orientation.DOWN);
+							if (tankY + delta <= JBattleCity.WIDTH - 40
+									&& mapState.getCell(oldXCell, incYCell + 3) == Cell.empty
+									&& mapState.getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
+								tankY += delta;
+							}
+							break;
+						}
+						case KeyEvent.VK_RIGHT: {
+							you.setOrientation(Orientation.RIGHT);
+							if (tankX + delta <= JBattleCity.HEIGHT - 40
+									&& mapState.getCell(incXCell + 3, oldYCell) == Cell.empty
+									&& mapState.getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
+								tankX += delta;
+							}
+							break;
+						}
+						case KeyEvent.VK_CAPS_LOCK: {
+							ProjectileState ps = new ProjectileState();
+							switch (you.getOrientation()) {
+								case UP: {
+									ps.setX(you.getX() + 20 - 3);
+									ps.setY(you.getY() - 3);
+									ps.setOrientation(Orientation.UP);
+									break;
+								}
+								case RIGHT: {
+									ps.setX(you.getX() + 40 - 3);
+									ps.setY(you.getY() + 20 - 3);
+									ps.setOrientation(Orientation.RIGHT);
+									break;
+								}
+								case DOWN: {
+									ps.setX(you.getX() + 20 - 3);
+									ps.setY(you.getY() + 40 - 3);
+									ps.setOrientation(Orientation.DOWN);
+									break;
+								}
+								case LEFT: {
+									ps.setX(you.getX() - 3);
+									ps.setY(you.getY() + 20 - 3);
+									ps.setOrientation(Orientation.LEFT);
+									break;
+								}
+							}
+							mapState.addProjectile(ps);
+						}
 					}
+					
+					you.setX(tankX);
+					you.setY(tankY);
+					mapState.setYou(you);
 				}
-				
-				you.setX(tankX);
-				you.setY(tankY);
-				mapState.setYou(you);
 				
 				return false;
 			}
