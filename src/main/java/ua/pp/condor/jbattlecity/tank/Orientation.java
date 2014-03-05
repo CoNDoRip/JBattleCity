@@ -1,4 +1,4 @@
-package ua.pp.condor.jbattlecity.area;
+package ua.pp.condor.jbattlecity.tank;
 
 public enum Orientation {
 	UP,

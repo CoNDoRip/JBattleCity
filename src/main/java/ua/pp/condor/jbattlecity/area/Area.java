@@ -14,6 +14,8 @@ import javax.swing.Timer;
 
 import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
+import ua.pp.condor.jbattlecity.tank.Orientation;
+import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.utils.Images;
 
 public class Area extends JPanel {
@@ -40,8 +42,10 @@ public class Area extends JPanel {
 			public boolean dispatchKeyEvent(KeyEvent arg0) {
 				final int delta = 10;
 				
-				int tankX = mapState.getTankX();
-				int tankY = mapState.getTankY();
+				TankState you = mapState.getYou();
+				
+				int tankX = you.getX();
+				int tankY = you.getY();
 				
 				int oldXCell =  tankX / 10;
 				int incXCell = (tankX + delta) / 10;
@@ -52,7 +56,7 @@ public class Area extends JPanel {
 				
 				switch(arg0.getKeyCode()) {
 					case KeyEvent.VK_UP: {
-						mapState.setTankOrientation(Orientation.UP);
+						you.setOrientation(Orientation.UP);
 						if (tankY - delta >= 0
 								&& mapState.getCell(oldXCell, decYCell) == Cell.empty
 								&& mapState.getCell(oldXCell + 3, decYCell) == Cell.empty) {
@@ -61,7 +65,7 @@ public class Area extends JPanel {
 						break;
 					}
 					case KeyEvent.VK_LEFT: {
-						mapState.setTankOrientation(Orientation.LEFT);
+						you.setOrientation(Orientation.LEFT);
 						if (tankX - delta >= 0
 								&& mapState.getCell(decXCell, oldYCell) == Cell.empty
 								&& mapState.getCell(decXCell, oldYCell + 3) == Cell.empty) {
@@ -70,7 +74,7 @@ public class Area extends JPanel {
 						break;
 					}
 					case KeyEvent.VK_DOWN: {
-						mapState.setTankOrientation(Orientation.DOWN);
+						you.setOrientation(Orientation.DOWN);
 						if (tankY + delta <= JBattleCity.WIDTH - 40
 								&& mapState.getCell(oldXCell, incYCell + 3) == Cell.empty
 								&& mapState.getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
@@ -79,7 +83,7 @@ public class Area extends JPanel {
 						break;
 					}
 					case KeyEvent.VK_RIGHT: {
-						mapState.setTankOrientation(Orientation.RIGHT);
+						you.setOrientation(Orientation.RIGHT);
 						if (tankX + delta <= JBattleCity.HEIGHT - 40
 								&& mapState.getCell(incXCell + 3, oldYCell) == Cell.empty
 								&& mapState.getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
@@ -89,8 +93,9 @@ public class Area extends JPanel {
 					}
 				}
 				
-				mapState.setTankX(tankX);
-				mapState.setTankY(tankY);
+				you.setX(tankX);
+				you.setY(tankY);
+				mapState.setYou(you);
 				
 				return false;
 			}
@@ -126,11 +131,12 @@ public class Area extends JPanel {
 			}
 		}
         
-        switch(mapState.getTankOrientation()) {
-    		case UP:    g.drawImage(Images.getYouUp(),    mapState.getTankX(), mapState.getTankY(), this); break;
-        	case RIGHT: g.drawImage(Images.getYouRight(), mapState.getTankX(), mapState.getTankY(), this); break;
-        	case DOWN:  g.drawImage(Images.getYouDown(),  mapState.getTankX(), mapState.getTankY(), this); break;
-        	case LEFT:  g.drawImage(Images.getYouLeft(),  mapState.getTankX(), mapState.getTankY(), this); break;
+        TankState you = mapState.getYou();
+        switch(you.getOrientation()) {
+    		case UP:    g.drawImage(Images.getYouUp(),    you.getX(), you.getY(), this); break;
+        	case RIGHT: g.drawImage(Images.getYouRight(), you.getX(), you.getY(), this); break;
+        	case DOWN:  g.drawImage(Images.getYouDown(),  you.getX(), you.getY(), this); break;
+        	case LEFT:  g.drawImage(Images.getYouLeft(),  you.getX(), you.getY(), this); break;
         }
     }
 	

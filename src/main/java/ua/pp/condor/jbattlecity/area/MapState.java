@@ -3,6 +3,8 @@ package ua.pp.condor.jbattlecity.area;
 import java.awt.Image;
 
 import ua.pp.condor.jbattlecity.area.maps.IMap;
+import ua.pp.condor.jbattlecity.tank.Orientation;
+import ua.pp.condor.jbattlecity.tank.TankState;
 
 public class MapState implements IMap {
 	
@@ -16,9 +18,7 @@ public class MapState implements IMap {
 	
 	private IMap map;
 	
-	private int tankX = 160;
-	private int tankY = 480;
-	private Orientation tankOrientation = Orientation.UP;
+	private TankState you;
 	
 	public MapState(IMap map) {
 		this.map = map;
@@ -27,6 +27,7 @@ public class MapState implements IMap {
 				currentMap[x][y] = map.getCell(x, y);
 			}
 		}
+		you = new TankState(160, 480, Orientation.UP);
 	}
 
 	public Cell getCell(int x, int y) {
@@ -37,28 +38,12 @@ public class MapState implements IMap {
 		return map.getMapImage();
 	}
 
-	public int getTankX() {
-		return tankX;
+	public TankState getYou() {
+		return you;
 	}
 
-	public void setTankX(int tankX) {
-		this.tankX = tankX;
-	}
-
-	public int getTankY() {
-		return tankY;
-	}
-
-	public void setTankY(int tankY) {
-		this.tankY = tankY;
-	}
-
-	public Orientation getTankOrientation() {
-		return tankOrientation;
-	}
-
-	public void setTankOrientation(Orientation tankOrientation) {
-		this.tankOrientation = tankOrientation;
+	public void setYou(TankState you) {
+		this.you = you;
 	}
 
 }
