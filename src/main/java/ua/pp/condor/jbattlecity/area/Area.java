@@ -44,6 +44,7 @@ public class Area extends JPanel {
 			public boolean dispatchKeyEvent(KeyEvent arg0) {
 				if (arg0.getID() == KeyEvent.KEY_PRESSED) {
 					final int delta = 5;
+					final int step = 3;
 					
 					TankState you = mapState.getYou();
 					
@@ -51,10 +52,12 @@ public class Area extends JPanel {
 					int tankY = you.getY();
 					
 					int oldXCell = tankX / 10;
-					int incXCell = Math.round((tankX + delta) / 10f);
+					int oldXRoundCell = Math.round(tankX / 10f);
+					int incXRoundCell = Math.round((tankX + delta) / 10f);
 					int decXCell = (tankX - delta) / 10;
 					int oldYCell = tankY / 10;
-					int incYCell = Math.round((tankY + delta) / 10f);
+					int oldYRoundCell = Math.round(tankY / 10f);
+					int incYRoundCell = Math.round((tankY + delta) / 10f);
 					int decYCell = (tankY - delta) / 10;
 					
 					switch (arg0.getKeyCode()) {
@@ -62,7 +65,7 @@ public class Area extends JPanel {
 							you.setOrientation(Orientation.UP);
 							if (tankY - delta >= 0
 									&& mapState.getCell(oldXCell, decYCell) == Cell.empty
-									&& mapState.getCell(oldXCell + 3, decYCell) == Cell.empty) {
+									&& mapState.getCell(oldXRoundCell + step, decYCell) == Cell.empty) {
 								tankY -= delta;
 							}
 							break;
@@ -71,7 +74,7 @@ public class Area extends JPanel {
 							you.setOrientation(Orientation.LEFT);
 							if (tankX - delta >= 0
 									&& mapState.getCell(decXCell, oldYCell) == Cell.empty
-									&& mapState.getCell(decXCell, oldYCell + 3) == Cell.empty) {
+									&& mapState.getCell(decXCell, oldYRoundCell + step) == Cell.empty) {
 								tankX -= delta;
 							}
 							break;
@@ -79,8 +82,8 @@ public class Area extends JPanel {
 						case KeyEvent.VK_DOWN: {
 							you.setOrientation(Orientation.DOWN);
 							if (tankY + delta <= JBattleCity.WIDTH - 40
-									&& mapState.getCell(oldXCell, incYCell + 3) == Cell.empty
-									&& mapState.getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
+									&& mapState.getCell(oldXCell, incYRoundCell + step) == Cell.empty
+									&& mapState.getCell(oldXRoundCell + step, incYRoundCell + step) == Cell.empty) {
 								tankY += delta;
 							}
 							break;
@@ -88,8 +91,8 @@ public class Area extends JPanel {
 						case KeyEvent.VK_RIGHT: {
 							you.setOrientation(Orientation.RIGHT);
 							if (tankX + delta <= JBattleCity.HEIGHT - 40
-									&& mapState.getCell(incXCell + 3, oldYCell) == Cell.empty
-									&& mapState.getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
+									&& mapState.getCell(incXRoundCell + step, oldYCell) == Cell.empty
+									&& mapState.getCell(incXRoundCell + step, oldYRoundCell + step) == Cell.empty) {
 								tankX += delta;
 							}
 							break;

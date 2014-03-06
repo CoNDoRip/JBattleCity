@@ -43,7 +43,7 @@ public class MapState implements IMap {
 			
 			@Override
 			public void run() {
-				int delta = 4;
+				int delta = 5;
 				
 				for (int i = 0; i < projectiles.size(); i++) {
 					ProjectileState ps = projectiles.get(i);
