@@ -50,11 +50,11 @@ public class Area extends JPanel {
 					int tankX = you.getX();
 					int tankY = you.getY();
 					
-					int oldXCell =  tankX / 10;
-					int incXCell = (tankX + delta) / 10;
+					int oldXCell = tankX / 10;
+					int incXCell = Math.round((tankX + delta) / 10f);
 					int decXCell = (tankX - delta) / 10;
-					int oldYCell =  tankY / 10;
-					int incYCell = (tankY + delta) / 10;
+					int oldYCell = tankY / 10;
+					int incYCell = Math.round((tankY + delta) / 10f);
 					int decYCell = (tankY - delta) / 10;
 					
 					switch (arg0.getKeyCode()) {
