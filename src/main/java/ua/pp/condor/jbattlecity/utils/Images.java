@@ -15,6 +15,7 @@ public class Images {
 	private static final String YOU_LEFT  = "/img/you_left.gif";
 	
 	private static final String PROJECTILE  = "/img/projectile.gif";
+	public static final int PROJECTILE_SIZE  = 3;
 
 	private static Image stage1;
 	

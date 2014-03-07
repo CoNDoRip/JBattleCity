@@ -44,7 +44,6 @@ public class Area extends JPanel {
 			public boolean dispatchKeyEvent(KeyEvent arg0) {
 				if (arg0.getID() == KeyEvent.KEY_PRESSED) {
 					final int delta = 5;
-					final int step = 3;
 					
 					TankState you = mapState.getYou();
 					
@@ -65,7 +64,9 @@ public class Area extends JPanel {
 							you.setOrientation(Orientation.UP);
 							if (tankY - delta >= 0
 									&& mapState.getCell(oldXCell, decYCell) == Cell.empty
-									&& mapState.getCell(oldXRoundCell + step, decYCell) == Cell.empty) {
+									&& mapState.getCell(oldXRoundCell + 1, decYCell) == Cell.empty
+									&& mapState.getCell(oldXRoundCell + 2, decYCell) == Cell.empty
+									&& mapState.getCell(oldXRoundCell + 3, decYCell) == Cell.empty) {
 								tankY -= delta;
 							}
 							break;
@@ -74,25 +75,31 @@ public class Area extends JPanel {
 							you.setOrientation(Orientation.LEFT);
 							if (tankX - delta >= 0
 									&& mapState.getCell(decXCell, oldYCell) == Cell.empty
-									&& mapState.getCell(decXCell, oldYRoundCell + step) == Cell.empty) {
+									&& mapState.getCell(decXCell, oldYRoundCell + 1) == Cell.empty
+									&& mapState.getCell(decXCell, oldYRoundCell + 2) == Cell.empty
+									&& mapState.getCell(decXCell, oldYRoundCell + 3) == Cell.empty) {
 								tankX -= delta;
 							}
 							break;
 						}
 						case KeyEvent.VK_DOWN: {
 							you.setOrientation(Orientation.DOWN);
-							if (tankY + delta <= JBattleCity.WIDTH - 40
-									&& mapState.getCell(oldXCell, incYRoundCell + step) == Cell.empty
-									&& mapState.getCell(oldXRoundCell + step, incYRoundCell + step) == Cell.empty) {
+							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
+									&& mapState.getCell(oldXCell, incYRoundCell + 3) == Cell.empty
+									&& mapState.getCell(oldXRoundCell + 1, incYRoundCell + 3) == Cell.empty
+									&& mapState.getCell(oldXRoundCell + 2, incYRoundCell + 3) == Cell.empty
+									&& mapState.getCell(oldXRoundCell + 3, incYRoundCell + 3) == Cell.empty) {
 								tankY += delta;
 							}
 							break;
 						}
 						case KeyEvent.VK_RIGHT: {
 							you.setOrientation(Orientation.RIGHT);
-							if (tankX + delta <= JBattleCity.HEIGHT - 40
-									&& mapState.getCell(incXRoundCell + step, oldYCell) == Cell.empty
-									&& mapState.getCell(incXRoundCell + step, oldYRoundCell + step) == Cell.empty) {
+							if (tankX + delta <= JBattleCity.HEIGHT - MapState.BLOCK_SIZE_PIXEL
+									&& mapState.getCell(incXRoundCell + 3, oldYCell) == Cell.empty
+									&& mapState.getCell(incXRoundCell + 3, oldYRoundCell + 1) == Cell.empty
+									&& mapState.getCell(incXRoundCell + 3, oldYRoundCell + 2) == Cell.empty
+									&& mapState.getCell(incXRoundCell + 3, oldYRoundCell + 3) == Cell.empty) {
 								tankX += delta;
 							}
 							break;
@@ -101,26 +108,26 @@ public class Area extends JPanel {
 							ProjectileState ps = new ProjectileState();
 							switch (you.getOrientation()) {
 								case UP: {
-									ps.setX(you.getX() + 20 - 3);
-									ps.setY(you.getY() - 3);
+									ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setY(you.getY());
 									ps.setOrientation(Orientation.UP);
 									break;
 								}
 								case RIGHT: {
-									ps.setX(you.getX() + 40 - 3);
-									ps.setY(you.getY() + 20 - 3);
+									ps.setX(you.getX() + MapState.BLOCK_SIZE_PIXEL);
+									ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
 									ps.setOrientation(Orientation.RIGHT);
 									break;
 								}
 								case DOWN: {
-									ps.setX(you.getX() + 20 - 3);
-									ps.setY(you.getY() + 40 - 3);
+									ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setY(you.getY() + MapState.BLOCK_SIZE_PIXEL);
 									ps.setOrientation(Orientation.DOWN);
 									break;
 								}
 								case LEFT: {
-									ps.setX(you.getX() - 3);
-									ps.setY(you.getY() + 20 - 3);
+									ps.setX(you.getX());
+									ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
 									ps.setOrientation(Orientation.LEFT);
 									break;
 								}
@@ -178,7 +185,7 @@ public class Area extends JPanel {
         }
         
         for (ProjectileState ps : mapState.getProjectiles()) {
-        	g.drawImage(Images.getProjectile(), ps.getX(), ps.getY(), this);
+        	g.drawImage(Images.getProjectile(), ps.getX() - Images.PROJECTILE_SIZE, ps.getY() - Images.PROJECTILE_SIZE, this);
         }
     }
 	

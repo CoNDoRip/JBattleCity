@@ -11,12 +11,14 @@ import ua.pp.condor.jbattlecity.area.maps.IMap;
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
+import ua.pp.condor.jbattlecity.utils.Images;
 
 public class MapState implements IMap {
 	
 	public static final int BLOCKS_COUNT = 13;
 	public static final int BLOCK_SIZE = 4;
 	public static final int BLOCK_SIZE_PIXEL = 40;
+	public static final int HALF_BLOCK_SIZE_PIXEL = 20;
 	
 	public static final int ARRAY_SIZE = BLOCKS_COUNT * BLOCK_SIZE;
 	
@@ -47,18 +49,71 @@ public class MapState implements IMap {
 				
 				for (int i = 0; i < projectiles.size(); i++) {
 					ProjectileState ps = projectiles.get(i);
-					if (ps.getX() < 0 || ps.getX() > JBattleCity.WIDTH
-					 || ps.getY() < 0 || ps.getY() > JBattleCity.HEIGHT) {
+					if (ps.getX() < Images.PROJECTILE_SIZE || ps.getX() > JBattleCity.WIDTH  - Images.PROJECTILE_SIZE - delta
+					 || ps.getY() < Images.PROJECTILE_SIZE || ps.getY() > JBattleCity.HEIGHT - Images.PROJECTILE_SIZE - delta) {
 						projectiles.remove(i);
 						continue;
 					}
 					
+					int x = 0, y = 0;
+					int x1 = 0, y1 = 0;
+					int x2 = 0, y2 = 0;
+					int x3 = 0, y3 = 0;
 					switch (ps.getOrientation()) {
-			    		case UP:    ps.setY(ps.getY() - delta); break;
-			        	case RIGHT: ps.setX(ps.getX() + delta); break;
-			        	case DOWN:  ps.setY(ps.getY() + delta); break;
-			        	case LEFT:  ps.setX(ps.getX() - delta); break;
+			    		case UP: {
+			    			int newY = ps.getY() - delta;
+			    			x = ps.getX() / 10; y = newY / 10;
+			    			x1 = x - 1; y1 = y;
+			    			x2 = x - 2; y2 = y;
+			    			x3 = x + 1; y3 = y;
+			    			ps.setY(newY);
+			    			break;
+			    		}
+			        	case RIGHT: {
+			    			int newX = ps.getX() + delta;
+			    			x = newX / 10; y = ps.getY() / 10;
+			    			x1 = x; y1 = y - 1;
+			    			x2 = x; y2 = y - 2;
+			    			x3 = x; y3 = y + 1;
+			        		ps.setX(newX);
+			        		break;
+			        	}
+			        	case DOWN: {
+			    			int newY = ps.getY() + delta;
+			    			x = ps.getX() / 10; y = newY / 10;
+			    			x1 = x - 1; y1 = y;
+			    			x2 = x - 2; y2 = y;
+			    			x3 = x + 1; y3 = y;
+			        		ps.setY(newY);
+			        		break;
+			        	}
+			        	case LEFT: {
+			    			int newX = ps.getX() - delta;
+			    			x = newX / 10; y = ps.getY() / 10;
+			    			x1 = x; y1 = y - 1;
+			    			x2 = x; y2 = y - 2;
+			    			x3 = x; y3 = y + 1;
+			        		ps.setX(newX);
+			        		break;
+			        	}
 					}
+					boolean removed = false;
+	    			if (getCell(x, y) != Cell.empty || getCell(x1, y1) != Cell.empty) {
+	    				projectiles.remove(i);
+	    			}
+	    			if (getCell(x, y) == Cell.wall) {
+	    				currentMap[x][y] = Cell.empty;
+	    				removed = true;
+	    			}
+	    			if (getCell(x1, y1) == Cell.wall) {
+	    				currentMap[x1][y1] = Cell.empty;
+	    				removed = true;
+	    			}
+	    			if (removed) {
+	    				currentMap[x1][y1] = Cell.empty;
+	    				currentMap[x2][y2] = Cell.empty;
+	    				currentMap[x3][y3] = Cell.empty;
+	    			}
 				}
 			}
 		}, 0, 15);
