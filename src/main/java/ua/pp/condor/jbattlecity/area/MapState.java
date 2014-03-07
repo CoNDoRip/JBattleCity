@@ -51,6 +51,7 @@ public class MapState implements IMap {
 					ProjectileState ps = projectiles.get(i);
 					if (ps.getX() < Images.PROJECTILE_SIZE || ps.getX() > JBattleCity.WIDTH  - Images.PROJECTILE_SIZE - delta
 					 || ps.getY() < Images.PROJECTILE_SIZE || ps.getY() > JBattleCity.HEIGHT - Images.PROJECTILE_SIZE - delta) {
+						ps.getParent().setHasProjectile(false);
 						projectiles.remove(i);
 						continue;
 					}
@@ -97,19 +98,20 @@ public class MapState implements IMap {
 			        		break;
 			        	}
 					}
-					boolean removed = false;
+					boolean destroyed = false;
 	    			if (getCell(x, y) != Cell.empty || getCell(x1, y1) != Cell.empty) {
+						ps.getParent().setHasProjectile(false);
 	    				projectiles.remove(i);
 	    			}
 	    			if (getCell(x, y) == Cell.wall) {
 	    				currentMap[x][y] = Cell.empty;
-	    				removed = true;
+	    				destroyed = true;
 	    			}
 	    			if (getCell(x1, y1) == Cell.wall) {
 	    				currentMap[x1][y1] = Cell.empty;
-	    				removed = true;
+	    				destroyed = true;
 	    			}
-	    			if (removed) {
+	    			if (destroyed) {
 	    				currentMap[x1][y1] = Cell.empty;
 	    				currentMap[x2][y2] = Cell.empty;
 	    				currentMap[x3][y3] = Cell.empty;

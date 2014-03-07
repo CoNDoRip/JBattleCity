@@ -105,6 +105,7 @@ public class Area extends JPanel {
 							break;
 						}
 						case KeyEvent.VK_CAPS_LOCK: {
+							if (you.isHasProjectile()) break;
 							ProjectileState ps = new ProjectileState();
 							switch (you.getOrientation()) {
 								case UP: {
@@ -132,6 +133,7 @@ public class Area extends JPanel {
 									break;
 								}
 							}
+							ps.setParent(you);
 							mapState.addProjectile(ps);
 						}
 					}
