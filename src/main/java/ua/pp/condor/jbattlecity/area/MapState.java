@@ -28,6 +28,10 @@ public class MapState implements IMap {
 	
 	private TankState you;
 	
+	private List<TankState> enemies;
+	
+	private Timer enemiesTimer;
+	
 	private List<ProjectileState> projectiles;
 	
 	private Timer projectilesTimer;
@@ -42,7 +46,19 @@ public class MapState implements IMap {
 			}
 		}
 		you = new TankState(160, 480, Orientation.UP);
+		enemies = new CopyOnWriteArrayList<TankState>();
 		projectiles = new CopyOnWriteArrayList<ProjectileState>();
+		
+		Timer enemiesTimer = new Timer();
+		enemiesTimer.schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				if (enemies.size() < 3) {
+					addEnemy();
+				}
+			}
+		}, 3000, 3000);
 		
 		Timer projectilesTimer = new Timer();
 		projectilesTimer.schedule(new TimerTask() {
@@ -50,6 +66,8 @@ public class MapState implements IMap {
 			@Override
 			public void run() {
 				int delta = 5;
+				
+				List<ProjectileState> projectiles = getProjectiles();
 				
 				for (int i = 0; i < projectiles.size(); i++) {
 					ProjectileState ps = projectiles.get(i);
@@ -148,13 +166,50 @@ public class MapState implements IMap {
 	public List<ProjectileState> getProjectiles() {
 		return projectiles;
 	}
-
-	public void setProjectiles(List<ProjectileState> projectiles) {
-		this.projectiles = projectiles;
-	}
 	
 	public void addProjectile(ProjectileState projectile) {
 		projectiles.add(projectile);
+	}
+
+	public List<TankState> getEnemies() {
+		return enemies;
+	}
+	
+	public boolean addEnemy() {
+		if (isEmptyBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0)) {
+			TankState enemy = new TankState(BLOCKS_COUNT / 2 * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
+			enemies.add(enemy);
+			setTankBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0);
+			return true;
+		} else if (isEmptyBlock(0, 0)) {
+			TankState enemy = new TankState(0, 0, Orientation.DOWN);
+			enemies.add(enemy);
+			setTankBlock(0, 0);
+			return true;
+		} else if (isEmptyBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0)) {
+			TankState enemy = new TankState((BLOCKS_COUNT - 1) * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
+			enemies.add(enemy);
+			setTankBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0);
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isEmptyBlock(int x, int y) {
+		if (getCell(x, y)     == Cell.empty && getCell(x + 1, y)     == Cell.empty && getCell(x + 2, y)     == Cell.empty && getCell(x + 3, y)     == Cell.empty
+		 && getCell(x, y + 1) == Cell.empty && getCell(x + 1, y + 1) == Cell.empty && getCell(x + 2, y + 1) == Cell.empty && getCell(x + 3, y + 1) == Cell.empty
+		 && getCell(x, y + 2) == Cell.empty && getCell(x + 1, y + 2) == Cell.empty && getCell(x + 2, y + 2) == Cell.empty && getCell(x + 3, y + 2) == Cell.empty
+		 && getCell(x, y + 3) == Cell.empty && getCell(x + 1, y + 3) == Cell.empty && getCell(x + 2, y + 3) == Cell.empty && getCell(x + 3, y + 3) == Cell.empty) {
+			return true;
+		}
+		return false;
+	}
+	
+	public void setTankBlock(int x, int y) {
+		currentMap[x][y]     = Cell.tank;	currentMap[x + 1][y]     = Cell.tank;	currentMap[x + 2][y]     = Cell.tank;	currentMap[x + 3][y]     = Cell.tank;
+		currentMap[x][y + 1] = Cell.tank;	currentMap[x + 1][y + 1] = Cell.tank;	currentMap[x + 2][y + 1] = Cell.tank;	currentMap[x + 3][y + 1] = Cell.tank;
+		currentMap[x][y + 2] = Cell.tank;	currentMap[x + 1][y + 2] = Cell.tank;	currentMap[x + 2][y + 2] = Cell.tank;	currentMap[x + 3][y + 2] = Cell.tank;
+		currentMap[x][y + 3] = Cell.tank;	currentMap[x + 1][y + 3] = Cell.tank;	currentMap[x + 2][y + 3] = Cell.tank;	currentMap[x + 3][y + 3] = Cell.tank;
 	}
 
 	public boolean isGameOver() {
@@ -163,6 +218,7 @@ public class MapState implements IMap {
 
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
+		enemiesTimer.cancel();
 		projectilesTimer.cancel();
 	}
 

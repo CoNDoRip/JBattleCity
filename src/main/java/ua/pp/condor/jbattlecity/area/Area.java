@@ -151,7 +151,11 @@ public class Area extends JPanel {
         mt.addImage(Images.getYouRight(), 2);
         mt.addImage(Images.getYouDown(), 2);
         mt.addImage(Images.getYouLeft(), 2);
-        mt.addImage(Images.getProjectile(), 3);
+        mt.addImage(Images.getEnemyUp(), 3);
+        mt.addImage(Images.getEnemyRight(), 3);
+        mt.addImage(Images.getEnemyDown(), 3);
+        mt.addImage(Images.getEnemyLeft(), 3);
+        mt.addImage(Images.getProjectile(), 8);
         mt.addImage(Images.getGameOver(), 9);
         
         try {
@@ -183,6 +187,15 @@ public class Area extends JPanel {
         	case RIGHT: g.drawImage(Images.getYouRight(), you.getX(), you.getY(), this); break;
         	case DOWN:  g.drawImage(Images.getYouDown(),  you.getX(), you.getY(), this); break;
         	case LEFT:  g.drawImage(Images.getYouLeft(),  you.getX(), you.getY(), this); break;
+        }
+        
+        for (TankState enemy : mapState.getEnemies()) {
+        	switch (enemy.getOrientation()) {
+	    		case UP:    g.drawImage(Images.getEnemyUp(),    enemy.getX(), enemy.getY(), this); break;
+	        	case RIGHT: g.drawImage(Images.getEnemyRight(), enemy.getX(), enemy.getY(), this); break;
+	        	case DOWN:  g.drawImage(Images.getEnemyDown(),  enemy.getX(), enemy.getY(), this); break;
+	        	case LEFT:  g.drawImage(Images.getEnemyLeft(),  enemy.getX(), enemy.getY(), this); break;
+        	}
         }
         
         for (ProjectileState ps : mapState.getProjectiles()) {

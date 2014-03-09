@@ -14,6 +14,11 @@ public class Images {
 	private static final String YOU_DOWN  = "/img/you_down.gif";
 	private static final String YOU_LEFT  = "/img/you_left.gif";
 	
+	private static final String ENEMY_UP    = "/img/enemy_up.gif";
+	private static final String ENEMY_RIGHT = "/img/enemy_right.gif";
+	private static final String ENEMY_DOWN  = "/img/enemy_down.gif";
+	private static final String ENEMY_LEFT  = "/img/enemy_left.gif";
+	
 	private static final String PROJECTILE  = "/img/projectile.gif";
 	public static final int PROJECTILE_SIZE  = 3;
 	
@@ -25,6 +30,11 @@ public class Images {
 	private static Image youRight;
 	private static Image youDown;
 	private static Image youLeft;
+	
+	private static Image enemyUp;
+	private static Image enemyRight;
+	private static Image enemyDown;
+	private static Image enemyLeft;
 	
 	private static Image projectile;
 	
@@ -68,6 +78,30 @@ public class Images {
 		if (youLeft == null)
 			youLeft = getImage(YOU_LEFT);
 		return youLeft;
+	}
+
+	public static Image getEnemyUp() {
+		if (enemyUp == null)
+			enemyUp = getImage(ENEMY_UP);
+		return enemyUp;
+	}
+
+	public static Image getEnemyRight() {
+		if (enemyRight == null)
+			enemyRight = getImage(ENEMY_RIGHT);
+		return enemyRight;
+	}
+
+	public static Image getEnemyDown() {
+		if (enemyDown == null)
+			enemyDown = getImage(ENEMY_DOWN);
+		return enemyDown;
+	}
+
+	public static Image getEnemyLeft() {
+		if (enemyLeft == null)
+			enemyLeft = getImage(ENEMY_LEFT);
+		return enemyLeft;
 	}
 
 	public static Image getProjectile() {
