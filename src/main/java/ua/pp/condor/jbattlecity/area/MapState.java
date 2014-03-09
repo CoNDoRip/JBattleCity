@@ -30,6 +30,10 @@ public class MapState implements IMap {
 	
 	private List<ProjectileState> projectiles;
 	
+	private Timer projectilesTimer;
+	
+	private boolean gameOver;
+	
 	public MapState(IMap map) {
 		this.map = map;
 		for (int x = 0; x < ARRAY_SIZE; x++) {
@@ -40,8 +44,8 @@ public class MapState implements IMap {
 		you = new TankState(160, 480, Orientation.UP);
 		projectiles = new CopyOnWriteArrayList<ProjectileState>();
 		
-		Timer t = new Timer();
-		t.schedule(new TimerTask() {
+		Timer projectilesTimer = new Timer();
+		projectilesTimer.schedule(new TimerTask() {
 			
 			@Override
 			public void run() {
@@ -103,6 +107,9 @@ public class MapState implements IMap {
 						ps.getParent().setHasProjectile(false);
 	    				projectiles.remove(i);
 	    			}
+	    			if (getCell(x, y) == Cell.base || getCell(x1, y1) == Cell.base) {
+	    				setGameOver(true);
+	    			}
 	    			if (getCell(x, y) == Cell.wall) {
 	    				currentMap[x][y] = Cell.empty;
 	    				destroyed = true;
@@ -112,9 +119,10 @@ public class MapState implements IMap {
 	    				destroyed = true;
 	    			}
 	    			if (destroyed) {
-	    				currentMap[x1][y1] = Cell.empty;
-	    				currentMap[x2][y2] = Cell.empty;
-	    				currentMap[x3][y3] = Cell.empty;
+	    				if (getCell(x2, y2) == Cell.wall)
+	    					currentMap[x2][y2] = Cell.empty;
+	    				if (getCell(x3, y3) == Cell.wall)
+	    					currentMap[x3][y3] = Cell.empty;
 	    			}
 				}
 			}
@@ -147,6 +155,15 @@ public class MapState implements IMap {
 	
 	public void addProjectile(ProjectileState projectile) {
 		projectiles.add(projectile);
+	}
+
+	public boolean isGameOver() {
+		return gameOver;
+	}
+
+	public void setGameOver(boolean gameOver) {
+		this.gameOver = gameOver;
+		projectilesTimer.cancel();
 	}
 
 }

@@ -16,6 +16,8 @@ public class Images {
 	
 	private static final String PROJECTILE  = "/img/projectile.gif";
 	public static final int PROJECTILE_SIZE  = 3;
+	
+	private static final String GAME_OVER  = "/img/game_over.gif";
 
 	private static Image stage1;
 	
@@ -25,6 +27,8 @@ public class Images {
 	private static Image youLeft;
 	
 	private static Image projectile;
+	
+	private static Image gameOver;
 	
 	public static Image getImage(String name) {
 		Image image = null;
@@ -70,6 +74,12 @@ public class Images {
 		if (projectile == null)
 			projectile = getImage(PROJECTILE);
 		return projectile;
+	}
+
+	public static Image getGameOver() {
+		if (gameOver == null)
+			gameOver = getImage(GAME_OVER);
+		return gameOver;
 	}
 
 }

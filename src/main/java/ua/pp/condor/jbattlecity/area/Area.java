@@ -14,7 +14,6 @@ import javax.swing.Timer;
 
 import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
-import ua.pp.condor.jbattlecity.tank.ItemState;
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
@@ -140,7 +139,6 @@ public class Area extends JPanel {
 					
 					you.setX(tankX);
 					you.setY(tankY);
-					mapState.setYou(you);
 				}
 				
 				return false;
@@ -154,6 +152,7 @@ public class Area extends JPanel {
         mt.addImage(Images.getYouDown(), 2);
         mt.addImage(Images.getYouLeft(), 2);
         mt.addImage(Images.getProjectile(), 3);
+        mt.addImage(Images.getGameOver(), 9);
         
         try {
 			mt.waitForAll();
@@ -178,7 +177,7 @@ public class Area extends JPanel {
 			}
 		}
         
-        ItemState you = mapState.getYou();
+        TankState you = mapState.getYou();
         switch (you.getOrientation()) {
     		case UP:    g.drawImage(Images.getYouUp(),    you.getX(), you.getY(), this); break;
         	case RIGHT: g.drawImage(Images.getYouRight(), you.getX(), you.getY(), this); break;
@@ -189,6 +188,9 @@ public class Area extends JPanel {
         for (ProjectileState ps : mapState.getProjectiles()) {
         	g.drawImage(Images.getProjectile(), ps.getX() - Images.PROJECTILE_SIZE, ps.getY() - Images.PROJECTILE_SIZE, this);
         }
+
+		if (mapState.isGameOver())
+	        g.drawImage(Images.getGameOver(), 110, 160, this);
     }
 	
 }
