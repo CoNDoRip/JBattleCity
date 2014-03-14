@@ -2,6 +2,7 @@ package ua.pp.condor.jbattlecity.area;
 
 import java.awt.Image;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -49,18 +50,125 @@ public class MapState implements IMap {
 		enemies = new CopyOnWriteArrayList<TankState>();
 		projectiles = new CopyOnWriteArrayList<ProjectileState>();
 		
-		Timer enemiesTimer = new Timer();
+		enemiesTimer = new Timer();
 		enemiesTimer.schedule(new TimerTask() {
+			
+			Random rand = new Random();
 			
 			@Override
 			public void run() {
 				if (enemies.size() < 3) {
 					addEnemy();
 				}
+
+				final int delta = 5;
+				
+				for (TankState enemy : enemies) {
+					
+					int tankX = enemy.getX();
+					int tankY = enemy.getY();
+					
+					int oldXCell = tankX / 10;
+					int oldXRoundCell = Math.round(tankX / 10f);
+					int incXRoundCell = Math.round((tankX + delta) / 10f);
+					int decXCell = (tankX - delta) / 10;
+					int oldYCell = tankY / 10;
+					int oldYRoundCell = Math.round(tankY / 10f);
+					int incYRoundCell = Math.round((tankY + delta) / 10f);
+					int decYCell = (tankY - delta) / 10;
+					
+					boolean moved = false;
+					switch (enemy.getOrientation()) {
+						case UP: {
+							if (tankY - delta >= 0
+									&& getCell(oldXCell, decYCell) == Cell.empty
+									&& getCell(oldXRoundCell + 1, decYCell) == Cell.empty
+									&& getCell(oldXRoundCell + 2, decYCell) == Cell.empty
+									&& getCell(oldXRoundCell + 3, decYCell) == Cell.empty) {
+								tankY -= delta;
+								moved = true;
+							}
+							break;
+						}
+						case RIGHT: {
+							if (tankX + delta <= JBattleCity.HEIGHT - MapState.BLOCK_SIZE_PIXEL
+									&& getCell(incXRoundCell + 3, oldYCell) == Cell.empty
+									&& getCell(incXRoundCell + 3, oldYRoundCell + 1) == Cell.empty
+									&& getCell(incXRoundCell + 3, oldYRoundCell + 2) == Cell.empty
+									&& getCell(incXRoundCell + 3, oldYRoundCell + 3) == Cell.empty) {
+								tankX += delta;
+								moved = true;
+							}
+							break;
+						}
+						case DOWN: {
+							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
+									&& getCell(oldXCell, incYRoundCell + 3) == Cell.empty
+									&& getCell(oldXRoundCell + 1, incYRoundCell + 3) == Cell.empty
+									&& getCell(oldXRoundCell + 2, incYRoundCell + 3) == Cell.empty
+									&& getCell(oldXRoundCell + 3, incYRoundCell + 3) == Cell.empty) {
+								tankY += delta;
+								moved = true;
+							}
+							break;
+						}
+						case LEFT: {
+							if (tankX - delta >= 0
+									&& getCell(decXCell, oldYCell) == Cell.empty
+									&& getCell(decXCell, oldYRoundCell + 1) == Cell.empty
+									&& getCell(decXCell, oldYRoundCell + 2) == Cell.empty
+									&& getCell(decXCell, oldYRoundCell + 3) == Cell.empty) {
+								tankX -= delta;
+								moved = true;
+							}
+							break;
+						}
+					}
+					
+					if (!moved) {
+						int desision = rand.nextInt(8);
+						if (desision < 4) {
+							enemy.setOrientation(Orientation.values()[desision]);
+						} else if (!enemy.isHasProjectile()) {
+							ProjectileState ps = new ProjectileState();
+							switch (enemy.getOrientation()) {
+								case UP: {
+									ps.setX(enemy.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setY(enemy.getY());
+									ps.setOrientation(Orientation.UP);
+									break;
+								}
+								case RIGHT: {
+									ps.setX(enemy.getX() + MapState.BLOCK_SIZE_PIXEL);
+									ps.setY(enemy.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setOrientation(Orientation.RIGHT);
+									break;
+								}
+								case DOWN: {
+									ps.setX(enemy.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setY(enemy.getY() + MapState.BLOCK_SIZE_PIXEL);
+									ps.setOrientation(Orientation.DOWN);
+									break;
+								}
+								case LEFT: {
+									ps.setX(enemy.getX());
+									ps.setY(enemy.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setOrientation(Orientation.LEFT);
+									break;
+								}
+							}
+							ps.setParent(enemy);
+							addProjectile(ps);
+						}
+					}
+					
+					enemy.setX(tankX);
+					enemy.setY(tankY);
+				}
 			}
-		}, 3000, 3000);
+		}, 1000, 20);
 		
-		Timer projectilesTimer = new Timer();
+		projectilesTimer = new Timer();
 		projectilesTimer.schedule(new TimerTask() {
 			
 			@Override
@@ -179,17 +287,17 @@ public class MapState implements IMap {
 		if (isEmptyBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0)) {
 			TankState enemy = new TankState(BLOCKS_COUNT / 2 * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
 			enemies.add(enemy);
-			setTankBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0);
+//			setTankBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0);
 			return true;
 		} else if (isEmptyBlock(0, 0)) {
 			TankState enemy = new TankState(0, 0, Orientation.DOWN);
 			enemies.add(enemy);
-			setTankBlock(0, 0);
+//			setTankBlock(0, 0);
 			return true;
 		} else if (isEmptyBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0)) {
 			TankState enemy = new TankState((BLOCKS_COUNT - 1) * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
 			enemies.add(enemy);
-			setTankBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0);
+//			setTankBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0);
 			return true;
 		}
 		return false;

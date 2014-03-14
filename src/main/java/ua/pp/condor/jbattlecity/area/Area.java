@@ -70,17 +70,6 @@ public class Area extends JPanel {
 							}
 							break;
 						}
-						case KeyEvent.VK_LEFT: {
-							you.setOrientation(Orientation.LEFT);
-							if (tankX - delta >= 0
-									&& mapState.getCell(decXCell, oldYCell) == Cell.empty
-									&& mapState.getCell(decXCell, oldYRoundCell + 1) == Cell.empty
-									&& mapState.getCell(decXCell, oldYRoundCell + 2) == Cell.empty
-									&& mapState.getCell(decXCell, oldYRoundCell + 3) == Cell.empty) {
-								tankX -= delta;
-							}
-							break;
-						}
 						case KeyEvent.VK_DOWN: {
 							you.setOrientation(Orientation.DOWN);
 							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
@@ -100,6 +89,17 @@ public class Area extends JPanel {
 									&& mapState.getCell(incXRoundCell + 3, oldYRoundCell + 2) == Cell.empty
 									&& mapState.getCell(incXRoundCell + 3, oldYRoundCell + 3) == Cell.empty) {
 								tankX += delta;
+							}
+							break;
+						}
+						case KeyEvent.VK_LEFT: {
+							you.setOrientation(Orientation.LEFT);
+							if (tankX - delta >= 0
+									&& mapState.getCell(decXCell, oldYCell) == Cell.empty
+									&& mapState.getCell(decXCell, oldYRoundCell + 1) == Cell.empty
+									&& mapState.getCell(decXCell, oldYRoundCell + 2) == Cell.empty
+									&& mapState.getCell(decXCell, oldYRoundCell + 3) == Cell.empty) {
+								tankX -= delta;
 							}
 							break;
 						}
