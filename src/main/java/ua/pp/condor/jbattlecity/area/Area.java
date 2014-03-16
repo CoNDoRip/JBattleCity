@@ -2,19 +2,14 @@ package ua.pp.condor.jbattlecity.area;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
-import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.utils.Images;
@@ -36,114 +31,6 @@ public class Area extends JPanel {
 				repaint();
 			}
 		}).start();
-        
-        KeyboardFocusManager.getCurrentKeyboardFocusManager()
-        	.addKeyEventDispatcher(new KeyEventDispatcher() {
-			
-			public boolean dispatchKeyEvent(KeyEvent arg0) {
-				if (arg0.getID() == KeyEvent.KEY_PRESSED) {
-					final int delta = 5;
-					
-					TankState you = mapState.getYou();
-					
-					int tankX = you.getX();
-					int tankY = you.getY();
-					
-					int oldXCell = tankX / 10;
-					int oldXRoundCell = Math.round(tankX / 10f);
-					int incXRoundCell = Math.round((tankX + delta) / 10f);
-					int decXCell = (tankX - delta) / 10;
-					int oldYCell = tankY / 10;
-					int oldYRoundCell = Math.round(tankY / 10f);
-					int incYRoundCell = Math.round((tankY + delta) / 10f);
-					int decYCell = (tankY - delta) / 10;
-					
-					switch (arg0.getKeyCode()) {
-						case KeyEvent.VK_UP: {
-							you.setOrientation(Orientation.UP);
-							if (tankY - delta >= 0
-									&& mapState.getCell(oldXCell, decYCell) == Cell.empty
-									&& mapState.getCell(oldXRoundCell + 1, decYCell) == Cell.empty
-									&& mapState.getCell(oldXRoundCell + 2, decYCell) == Cell.empty
-									&& mapState.getCell(oldXRoundCell + 3, decYCell) == Cell.empty) {
-								tankY -= delta;
-							}
-							break;
-						}
-						case KeyEvent.VK_DOWN: {
-							you.setOrientation(Orientation.DOWN);
-							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
-									&& mapState.getCell(oldXCell, incYRoundCell + 3) == Cell.empty
-									&& mapState.getCell(oldXRoundCell + 1, incYRoundCell + 3) == Cell.empty
-									&& mapState.getCell(oldXRoundCell + 2, incYRoundCell + 3) == Cell.empty
-									&& mapState.getCell(oldXRoundCell + 3, incYRoundCell + 3) == Cell.empty) {
-								tankY += delta;
-							}
-							break;
-						}
-						case KeyEvent.VK_RIGHT: {
-							you.setOrientation(Orientation.RIGHT);
-							if (tankX + delta <= JBattleCity.HEIGHT - MapState.BLOCK_SIZE_PIXEL
-									&& mapState.getCell(incXRoundCell + 3, oldYCell) == Cell.empty
-									&& mapState.getCell(incXRoundCell + 3, oldYRoundCell + 1) == Cell.empty
-									&& mapState.getCell(incXRoundCell + 3, oldYRoundCell + 2) == Cell.empty
-									&& mapState.getCell(incXRoundCell + 3, oldYRoundCell + 3) == Cell.empty) {
-								tankX += delta;
-							}
-							break;
-						}
-						case KeyEvent.VK_LEFT: {
-							you.setOrientation(Orientation.LEFT);
-							if (tankX - delta >= 0
-									&& mapState.getCell(decXCell, oldYCell) == Cell.empty
-									&& mapState.getCell(decXCell, oldYRoundCell + 1) == Cell.empty
-									&& mapState.getCell(decXCell, oldYRoundCell + 2) == Cell.empty
-									&& mapState.getCell(decXCell, oldYRoundCell + 3) == Cell.empty) {
-								tankX -= delta;
-							}
-							break;
-						}
-						case KeyEvent.VK_CAPS_LOCK: {
-							if (you.isHasProjectile()) break;
-							ProjectileState ps = new ProjectileState();
-							switch (you.getOrientation()) {
-								case UP: {
-									ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setY(you.getY());
-									ps.setOrientation(Orientation.UP);
-									break;
-								}
-								case RIGHT: {
-									ps.setX(you.getX() + MapState.BLOCK_SIZE_PIXEL);
-									ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setOrientation(Orientation.RIGHT);
-									break;
-								}
-								case DOWN: {
-									ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setY(you.getY() + MapState.BLOCK_SIZE_PIXEL);
-									ps.setOrientation(Orientation.DOWN);
-									break;
-								}
-								case LEFT: {
-									ps.setX(you.getX());
-									ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setOrientation(Orientation.LEFT);
-									break;
-								}
-							}
-							ps.setParent(you);
-							mapState.addProjectile(ps);
-						}
-					}
-					
-					you.setX(tankX);
-					you.setY(tankY);
-				}
-				
-				return false;
-			}
-		});
         
         MediaTracker mt = new MediaTracker(this);
         mt.addImage(mapState.getMapImage(), 1);

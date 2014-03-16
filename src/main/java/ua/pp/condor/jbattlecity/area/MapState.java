@@ -1,6 +1,9 @@
 package ua.pp.condor.jbattlecity.area;
 
 import java.awt.Image;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
@@ -29,6 +32,8 @@ public class MapState implements IMap {
 	
 	private TankState you;
 	
+	private KeyEventDispatcher yourKeyEventsDispatcher;
+	
 	private List<TankState> enemies;
 	
 	private Timer enemiesTimer;
@@ -49,6 +54,114 @@ public class MapState implements IMap {
 		you = new TankState(160, 480, Orientation.UP);
 		enemies = new CopyOnWriteArrayList<TankState>();
 		projectiles = new CopyOnWriteArrayList<ProjectileState>();
+		
+		yourKeyEventsDispatcher = new KeyEventDispatcher() {
+			
+			public boolean dispatchKeyEvent(KeyEvent arg0) {
+				if (arg0.getID() == KeyEvent.KEY_PRESSED) {
+					final int delta = 5;
+					
+					TankState you = getYou();
+					
+					int tankX = you.getX();
+					int tankY = you.getY();
+					
+					int oldXCell = tankX / 10;
+					int oldXRoundCell = Math.round(tankX / 10f);
+					int incXRoundCell = Math.round((tankX + delta) / 10f);
+					int decXCell = (tankX - delta) / 10;
+					int oldYCell = tankY / 10;
+					int oldYRoundCell = Math.round(tankY / 10f);
+					int incYRoundCell = Math.round((tankY + delta) / 10f);
+					int decYCell = (tankY - delta) / 10;
+					
+					switch (arg0.getKeyCode()) {
+						case KeyEvent.VK_UP: {
+							you.setOrientation(Orientation.UP);
+							if (tankY - delta >= 0
+									&& getCell(oldXCell, decYCell) == Cell.empty
+									&& getCell(oldXRoundCell + 1, decYCell) == Cell.empty
+									&& getCell(oldXRoundCell + 2, decYCell) == Cell.empty
+									&& getCell(oldXRoundCell + 3, decYCell) == Cell.empty) {
+								tankY -= delta;
+							}
+							break;
+						}
+						case KeyEvent.VK_DOWN: {
+							you.setOrientation(Orientation.DOWN);
+							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
+									&& getCell(oldXCell, incYRoundCell + 3) == Cell.empty
+									&& getCell(oldXRoundCell + 1, incYRoundCell + 3) == Cell.empty
+									&& getCell(oldXRoundCell + 2, incYRoundCell + 3) == Cell.empty
+									&& getCell(oldXRoundCell + 3, incYRoundCell + 3) == Cell.empty) {
+								tankY += delta;
+							}
+							break;
+						}
+						case KeyEvent.VK_RIGHT: {
+							you.setOrientation(Orientation.RIGHT);
+							if (tankX + delta <= JBattleCity.HEIGHT - MapState.BLOCK_SIZE_PIXEL
+									&& getCell(incXRoundCell + 3, oldYCell) == Cell.empty
+									&& getCell(incXRoundCell + 3, oldYRoundCell + 1) == Cell.empty
+									&& getCell(incXRoundCell + 3, oldYRoundCell + 2) == Cell.empty
+									&& getCell(incXRoundCell + 3, oldYRoundCell + 3) == Cell.empty) {
+								tankX += delta;
+							}
+							break;
+						}
+						case KeyEvent.VK_LEFT: {
+							you.setOrientation(Orientation.LEFT);
+							if (tankX - delta >= 0
+									&& getCell(decXCell, oldYCell) == Cell.empty
+									&& getCell(decXCell, oldYRoundCell + 1) == Cell.empty
+									&& getCell(decXCell, oldYRoundCell + 2) == Cell.empty
+									&& getCell(decXCell, oldYRoundCell + 3) == Cell.empty) {
+								tankX -= delta;
+							}
+							break;
+						}
+						case KeyEvent.VK_CAPS_LOCK: {
+							if (you.isHasProjectile()) break;
+							ProjectileState ps = new ProjectileState();
+							switch (you.getOrientation()) {
+								case UP: {
+									ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setY(you.getY());
+									ps.setOrientation(Orientation.UP);
+									break;
+								}
+								case RIGHT: {
+									ps.setX(you.getX() + MapState.BLOCK_SIZE_PIXEL);
+									ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setOrientation(Orientation.RIGHT);
+									break;
+								}
+								case DOWN: {
+									ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setY(you.getY() + MapState.BLOCK_SIZE_PIXEL);
+									ps.setOrientation(Orientation.DOWN);
+									break;
+								}
+								case LEFT: {
+									ps.setX(you.getX());
+									ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
+									ps.setOrientation(Orientation.LEFT);
+									break;
+								}
+							}
+							ps.setParent(you);
+							addProjectile(ps);
+						}
+					}
+					
+					you.setX(tankX);
+					you.setY(tankY);
+				}
+				
+				return false;
+			}
+		};
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventsDispatcher);
 		
 		enemiesTimer = new Timer();
 		enemiesTimer.schedule(new TimerTask() {
@@ -326,6 +439,7 @@ public class MapState implements IMap {
 
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventsDispatcher);
 		enemiesTimer.cancel();
 		projectilesTimer.cancel();
 	}
