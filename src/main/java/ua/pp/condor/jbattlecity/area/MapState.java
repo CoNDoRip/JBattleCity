@@ -516,17 +516,21 @@ public class MapState implements IMap {
 	}
 	
 	public void setTankBlock(int x, int y) {
-		currentMap[x][y]     = Cell.tank;	currentMap[x + 1][y]     = Cell.tank;	currentMap[x + 2][y]     = Cell.tank;	currentMap[x + 3][y]     = Cell.tank;
-		currentMap[x][y + 1] = Cell.tank;	currentMap[x + 1][y + 1] = Cell.tank;	currentMap[x + 2][y + 1] = Cell.tank;	currentMap[x + 3][y + 1] = Cell.tank;
-		currentMap[x][y + 2] = Cell.tank;	currentMap[x + 1][y + 2] = Cell.tank;	currentMap[x + 2][y + 2] = Cell.tank;	currentMap[x + 3][y + 2] = Cell.tank;
-		currentMap[x][y + 3] = Cell.tank;	currentMap[x + 1][y + 3] = Cell.tank;	currentMap[x + 2][y + 3] = Cell.tank;	currentMap[x + 3][y + 3] = Cell.tank;
+		synchronized (currentMap) {
+			currentMap[x][y]     = Cell.tank;	currentMap[x + 1][y]     = Cell.tank;	currentMap[x + 2][y]     = Cell.tank;	currentMap[x + 3][y]     = Cell.tank;
+			currentMap[x][y + 1] = Cell.tank;	currentMap[x + 1][y + 1] = Cell.tank;	currentMap[x + 2][y + 1] = Cell.tank;	currentMap[x + 3][y + 1] = Cell.tank;
+			currentMap[x][y + 2] = Cell.tank;	currentMap[x + 1][y + 2] = Cell.tank;	currentMap[x + 2][y + 2] = Cell.tank;	currentMap[x + 3][y + 2] = Cell.tank;
+			currentMap[x][y + 3] = Cell.tank;	currentMap[x + 1][y + 3] = Cell.tank;	currentMap[x + 2][y + 3] = Cell.tank;	currentMap[x + 3][y + 3] = Cell.tank;
+		}
 	}
 	
 	public void removeTankBlock(int x, int y) {
-		currentMap[x][y]     = Cell.empty;	currentMap[x + 1][y]     = Cell.empty;	currentMap[x + 2][y]     = Cell.empty;	currentMap[x + 3][y]     = Cell.empty;
-		currentMap[x][y + 1] = Cell.empty;	currentMap[x + 1][y + 1] = Cell.empty;	currentMap[x + 2][y + 1] = Cell.empty;	currentMap[x + 3][y + 1] = Cell.empty;
-		currentMap[x][y + 2] = Cell.empty;	currentMap[x + 1][y + 2] = Cell.empty;	currentMap[x + 2][y + 2] = Cell.empty;	currentMap[x + 3][y + 2] = Cell.empty;
-		currentMap[x][y + 3] = Cell.empty;	currentMap[x + 1][y + 3] = Cell.empty;	currentMap[x + 2][y + 3] = Cell.empty;	currentMap[x + 3][y + 3] = Cell.empty;
+		synchronized (currentMap) {
+			currentMap[x][y]     = Cell.empty;	currentMap[x + 1][y]     = Cell.empty;	currentMap[x + 2][y]     = Cell.empty;	currentMap[x + 3][y]     = Cell.empty;
+			currentMap[x][y + 1] = Cell.empty;	currentMap[x + 1][y + 1] = Cell.empty;	currentMap[x + 2][y + 1] = Cell.empty;	currentMap[x + 3][y + 1] = Cell.empty;
+			currentMap[x][y + 2] = Cell.empty;	currentMap[x + 1][y + 2] = Cell.empty;	currentMap[x + 2][y + 2] = Cell.empty;	currentMap[x + 3][y + 2] = Cell.empty;
+			currentMap[x][y + 3] = Cell.empty;	currentMap[x + 1][y + 3] = Cell.empty;	currentMap[x + 2][y + 3] = Cell.empty;	currentMap[x + 3][y + 3] = Cell.empty;
+		}
 	}
 	
 	public void destroyTank(int x, int y, int x1, int y1) {
@@ -539,9 +543,18 @@ public class MapState implements IMap {
 			
 			if (x >= tankXCell && x <= tankXCell + 3 && y >= tankYCell && y <= tankYCell + 3
 				|| x1 >= tankXCell && x1 <= tankXCell + 3 && y1 >= tankYCell && y1 <= tankYCell + 3) {
-				enemies.remove(enemyId);
 				removeTankBlock(tankXCell, tankYCell);
+				enemies.remove(enemyId);
 			}
+		}
+		int tankXCell = you.getX() / 10;
+		int tankYCell = you.getY() / 10;
+		
+		if (x >= tankXCell && x <= tankXCell + 3 && y >= tankYCell && y <= tankYCell + 3
+			|| x1 >= tankXCell && x1 <= tankXCell + 3 && y1 >= tankYCell && y1 <= tankYCell + 3) {
+			removeTankBlock(tankXCell, tankYCell);
+			you = null;
+			setGameOver(true);
 		}
 	}
 
