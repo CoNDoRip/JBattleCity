@@ -52,6 +52,7 @@ public class MapState implements IMap {
 			}
 		}
 		you = new TankState(160, 480, Orientation.UP);
+		setTankBlock(16, 48);
 		enemies = new CopyOnWriteArrayList<TankState>();
 		projectiles = new CopyOnWriteArrayList<ProjectileState>();
 		
@@ -59,7 +60,7 @@ public class MapState implements IMap {
 			
 			public boolean dispatchKeyEvent(KeyEvent arg0) {
 				if (arg0.getID() == KeyEvent.KEY_PRESSED) {
-					final int delta = 5;
+					final int delta = 10;
 					
 					TankState you = getYou();
 					
@@ -67,12 +68,10 @@ public class MapState implements IMap {
 					int tankY = you.getY();
 					
 					int oldXCell = tankX / 10;
-					int oldXRoundCell = Math.round(tankX / 10f);
-					int incXRoundCell = Math.round((tankX + delta) / 10f);
+					int incXCell = (tankX + delta) / 10;
 					int decXCell = (tankX - delta) / 10;
 					int oldYCell = tankY / 10;
-					int oldYRoundCell = Math.round(tankY / 10f);
-					int incYRoundCell = Math.round((tankY + delta) / 10f);
+					int incYCell = (tankY + delta) / 10;
 					int decYCell = (tankY - delta) / 10;
 					
 					switch (arg0.getKeyCode()) {
@@ -80,32 +79,62 @@ public class MapState implements IMap {
 							you.setOrientation(Orientation.UP);
 							if (tankY - delta >= 0
 									&& getCell(oldXCell, decYCell) == Cell.empty
-									&& getCell(oldXRoundCell + 1, decYCell) == Cell.empty
-									&& getCell(oldXRoundCell + 2, decYCell) == Cell.empty
-									&& getCell(oldXRoundCell + 3, decYCell) == Cell.empty) {
+									&& getCell(oldXCell + 1, decYCell) == Cell.empty
+									&& getCell(oldXCell + 2, decYCell) == Cell.empty
+									&& getCell(oldXCell + 3, decYCell) == Cell.empty) {
 								tankY -= delta;
-							}
-							break;
-						}
-						case KeyEvent.VK_DOWN: {
-							you.setOrientation(Orientation.DOWN);
-							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
-									&& getCell(oldXCell, incYRoundCell + 3) == Cell.empty
-									&& getCell(oldXRoundCell + 1, incYRoundCell + 3) == Cell.empty
-									&& getCell(oldXRoundCell + 2, incYRoundCell + 3) == Cell.empty
-									&& getCell(oldXRoundCell + 3, incYRoundCell + 3) == Cell.empty) {
-								tankY += delta;
+								
+								currentMap[oldXCell][decYCell] = Cell.tank;
+								currentMap[oldXCell + 1][decYCell] = Cell.tank;
+								currentMap[oldXCell + 2][decYCell] = Cell.tank;
+								currentMap[oldXCell + 3][decYCell] = Cell.tank;
+								
+								currentMap[oldXCell][decYCell + 4] = Cell.empty;
+								currentMap[oldXCell + 1][decYCell + 4] = Cell.empty;
+								currentMap[oldXCell + 2][decYCell + 4] = Cell.empty;
+								currentMap[oldXCell + 3][decYCell + 4] = Cell.empty;
 							}
 							break;
 						}
 						case KeyEvent.VK_RIGHT: {
 							you.setOrientation(Orientation.RIGHT);
 							if (tankX + delta <= JBattleCity.HEIGHT - MapState.BLOCK_SIZE_PIXEL
-									&& getCell(incXRoundCell + 3, oldYCell) == Cell.empty
-									&& getCell(incXRoundCell + 3, oldYRoundCell + 1) == Cell.empty
-									&& getCell(incXRoundCell + 3, oldYRoundCell + 2) == Cell.empty
-									&& getCell(incXRoundCell + 3, oldYRoundCell + 3) == Cell.empty) {
+									&& getCell(incXCell + 3, oldYCell) == Cell.empty
+									&& getCell(incXCell + 3, oldYCell + 1) == Cell.empty
+									&& getCell(incXCell + 3, oldYCell + 2) == Cell.empty
+									&& getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
 								tankX += delta;
+								
+								currentMap[incXCell + 3][oldYCell] = Cell.tank;
+								currentMap[incXCell + 3][oldYCell + 1] = Cell.tank;
+								currentMap[incXCell + 3][oldYCell + 2] = Cell.tank;
+								currentMap[incXCell + 3][oldYCell + 3] = Cell.tank;
+								
+								currentMap[oldXCell][oldYCell] = Cell.empty;
+								currentMap[oldXCell][oldYCell + 1] = Cell.empty;
+								currentMap[oldXCell][oldYCell + 2] = Cell.empty;
+								currentMap[oldXCell][oldYCell + 3] = Cell.empty;
+							}
+							break;
+						}
+						case KeyEvent.VK_DOWN: {
+							you.setOrientation(Orientation.DOWN);
+							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
+									&& getCell(oldXCell, incYCell + 3) == Cell.empty
+									&& getCell(oldXCell + 1, incYCell + 3) == Cell.empty
+									&& getCell(oldXCell + 2, incYCell + 3) == Cell.empty
+									&& getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
+								tankY += delta;
+								
+								currentMap[oldXCell][incYCell + 3] = Cell.tank;
+								currentMap[oldXCell + 1][incYCell + 3] = Cell.tank;
+								currentMap[oldXCell + 2][incYCell + 3] = Cell.tank;
+								currentMap[oldXCell + 3][incYCell + 3] = Cell.tank;
+								
+								currentMap[oldXCell][oldYCell] = Cell.empty;
+								currentMap[oldXCell + 1][oldYCell] = Cell.empty;
+								currentMap[oldXCell + 2][oldYCell] = Cell.empty;
+								currentMap[oldXCell + 3][oldYCell] = Cell.empty;
 							}
 							break;
 						}
@@ -113,10 +142,20 @@ public class MapState implements IMap {
 							you.setOrientation(Orientation.LEFT);
 							if (tankX - delta >= 0
 									&& getCell(decXCell, oldYCell) == Cell.empty
-									&& getCell(decXCell, oldYRoundCell + 1) == Cell.empty
-									&& getCell(decXCell, oldYRoundCell + 2) == Cell.empty
-									&& getCell(decXCell, oldYRoundCell + 3) == Cell.empty) {
+									&& getCell(decXCell, oldYCell + 1) == Cell.empty
+									&& getCell(decXCell, oldYCell + 2) == Cell.empty
+									&& getCell(decXCell, oldYCell + 3) == Cell.empty) {
 								tankX -= delta;
+								
+								currentMap[decXCell][oldYCell] = Cell.tank;
+								currentMap[decXCell][oldYCell + 1] = Cell.tank;
+								currentMap[decXCell][oldYCell + 2] = Cell.tank;
+								currentMap[decXCell][oldYCell + 3] = Cell.tank;
+								
+								currentMap[decXCell + 4][oldYCell] = Cell.empty;
+								currentMap[decXCell + 4][oldYCell + 1] = Cell.empty;
+								currentMap[decXCell + 4][oldYCell + 2] = Cell.empty;
+								currentMap[decXCell + 4][oldYCell + 3] = Cell.empty;
 							}
 							break;
 						}
@@ -174,7 +213,7 @@ public class MapState implements IMap {
 					addEnemy();
 				}
 
-				final int delta = 5;
+				final int delta = 10;
 				
 				for (TankState enemy : enemies) {
 					
@@ -182,12 +221,10 @@ public class MapState implements IMap {
 					int tankY = enemy.getY();
 					
 					int oldXCell = tankX / 10;
-					int oldXRoundCell = Math.round(tankX / 10f);
-					int incXRoundCell = Math.round((tankX + delta) / 10f);
+					int incXCell = (tankX + delta) / 10;
 					int decXCell = (tankX - delta) / 10;
 					int oldYCell = tankY / 10;
-					int oldYRoundCell = Math.round(tankY / 10f);
-					int incYRoundCell = Math.round((tankY + delta) / 10f);
+					int incYCell = (tankY + delta) / 10;
 					int decYCell = (tankY - delta) / 10;
 					
 					boolean moved = false;
@@ -195,32 +232,65 @@ public class MapState implements IMap {
 						case UP: {
 							if (tankY - delta >= 0
 									&& getCell(oldXCell, decYCell) == Cell.empty
-									&& getCell(oldXRoundCell + 1, decYCell) == Cell.empty
-									&& getCell(oldXRoundCell + 2, decYCell) == Cell.empty
-									&& getCell(oldXRoundCell + 3, decYCell) == Cell.empty) {
+									&& getCell(oldXCell + 1, decYCell) == Cell.empty
+									&& getCell(oldXCell + 2, decYCell) == Cell.empty
+									&& getCell(oldXCell + 3, decYCell) == Cell.empty) {
 								tankY -= delta;
+								
+								currentMap[oldXCell][decYCell] = Cell.tank;
+								currentMap[oldXCell + 1][decYCell] = Cell.tank;
+								currentMap[oldXCell + 2][decYCell] = Cell.tank;
+								currentMap[oldXCell + 3][decYCell] = Cell.tank;
+								
+								currentMap[oldXCell][decYCell + 4] = Cell.empty;
+								currentMap[oldXCell + 1][decYCell + 4] = Cell.empty;
+								currentMap[oldXCell + 2][decYCell + 4] = Cell.empty;
+								currentMap[oldXCell + 3][decYCell + 4] = Cell.empty;
+
 								moved = true;
 							}
 							break;
 						}
 						case RIGHT: {
 							if (tankX + delta <= JBattleCity.HEIGHT - MapState.BLOCK_SIZE_PIXEL
-									&& getCell(incXRoundCell + 3, oldYCell) == Cell.empty
-									&& getCell(incXRoundCell + 3, oldYRoundCell + 1) == Cell.empty
-									&& getCell(incXRoundCell + 3, oldYRoundCell + 2) == Cell.empty
-									&& getCell(incXRoundCell + 3, oldYRoundCell + 3) == Cell.empty) {
+									&& getCell(incXCell + 3, oldYCell) == Cell.empty
+									&& getCell(incXCell + 3, oldYCell + 1) == Cell.empty
+									&& getCell(incXCell + 3, oldYCell + 2) == Cell.empty
+									&& getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
 								tankX += delta;
+								
+								currentMap[incXCell + 3][oldYCell] = Cell.tank;
+								currentMap[incXCell + 3][oldYCell + 1] = Cell.tank;
+								currentMap[incXCell + 3][oldYCell + 2] = Cell.tank;
+								currentMap[incXCell + 3][oldYCell + 3] = Cell.tank;
+								
+								currentMap[oldXCell][oldYCell] = Cell.empty;
+								currentMap[oldXCell][oldYCell + 1] = Cell.empty;
+								currentMap[oldXCell][oldYCell + 2] = Cell.empty;
+								currentMap[oldXCell][oldYCell + 3] = Cell.empty;
+
 								moved = true;
 							}
 							break;
 						}
 						case DOWN: {
 							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
-									&& getCell(oldXCell, incYRoundCell + 3) == Cell.empty
-									&& getCell(oldXRoundCell + 1, incYRoundCell + 3) == Cell.empty
-									&& getCell(oldXRoundCell + 2, incYRoundCell + 3) == Cell.empty
-									&& getCell(oldXRoundCell + 3, incYRoundCell + 3) == Cell.empty) {
+									&& getCell(oldXCell, incYCell + 3) == Cell.empty
+									&& getCell(oldXCell + 1, incYCell + 3) == Cell.empty
+									&& getCell(oldXCell + 2, incYCell + 3) == Cell.empty
+									&& getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
 								tankY += delta;
+								
+								currentMap[oldXCell][incYCell + 3] = Cell.tank;
+								currentMap[oldXCell + 1][incYCell + 3] = Cell.tank;
+								currentMap[oldXCell + 2][incYCell + 3] = Cell.tank;
+								currentMap[oldXCell + 3][incYCell + 3] = Cell.tank;
+								
+								currentMap[oldXCell][oldYCell] = Cell.empty;
+								currentMap[oldXCell + 1][oldYCell] = Cell.empty;
+								currentMap[oldXCell + 2][oldYCell] = Cell.empty;
+								currentMap[oldXCell + 3][oldYCell] = Cell.empty;
+
 								moved = true;
 							}
 							break;
@@ -228,10 +298,21 @@ public class MapState implements IMap {
 						case LEFT: {
 							if (tankX - delta >= 0
 									&& getCell(decXCell, oldYCell) == Cell.empty
-									&& getCell(decXCell, oldYRoundCell + 1) == Cell.empty
-									&& getCell(decXCell, oldYRoundCell + 2) == Cell.empty
-									&& getCell(decXCell, oldYRoundCell + 3) == Cell.empty) {
+									&& getCell(decXCell, oldYCell + 1) == Cell.empty
+									&& getCell(decXCell, oldYCell + 2) == Cell.empty
+									&& getCell(decXCell, oldYCell + 3) == Cell.empty) {
 								tankX -= delta;
+								
+								currentMap[decXCell][oldYCell] = Cell.tank;
+								currentMap[decXCell][oldYCell + 1] = Cell.tank;
+								currentMap[decXCell][oldYCell + 2] = Cell.tank;
+								currentMap[decXCell][oldYCell + 3] = Cell.tank;
+								
+								currentMap[decXCell + 4][oldYCell] = Cell.empty;
+								currentMap[decXCell + 4][oldYCell + 1] = Cell.empty;
+								currentMap[decXCell + 4][oldYCell + 2] = Cell.empty;
+								currentMap[decXCell + 4][oldYCell + 3] = Cell.empty;
+
 								moved = true;
 							}
 							break;
@@ -279,7 +360,7 @@ public class MapState implements IMap {
 					enemy.setY(tankY);
 				}
 			}
-		}, 1000, 20);
+		}, 1000, 40);
 		
 		projectilesTimer = new Timer();
 		projectilesTimer.schedule(new TimerTask() {
@@ -400,17 +481,17 @@ public class MapState implements IMap {
 		if (isEmptyBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0)) {
 			TankState enemy = new TankState(BLOCKS_COUNT / 2 * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
 			enemies.add(enemy);
-//			setTankBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0);
+			setTankBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0);
 			return true;
 		} else if (isEmptyBlock(0, 0)) {
 			TankState enemy = new TankState(0, 0, Orientation.DOWN);
 			enemies.add(enemy);
-//			setTankBlock(0, 0);
+			setTankBlock(0, 0);
 			return true;
 		} else if (isEmptyBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0)) {
 			TankState enemy = new TankState((BLOCKS_COUNT - 1) * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
 			enemies.add(enemy);
-//			setTankBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0);
+			setTankBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0);
 			return true;
 		}
 		return false;
