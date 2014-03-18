@@ -430,6 +430,9 @@ public class MapState implements IMap {
 	    			if (getCell(x, y) == Cell.base || getCell(x1, y1) == Cell.base) {
 	    				setGameOver(true);
 	    			}
+	    			if (getCell(x, y) == Cell.tank || getCell(x1, y1) == Cell.base) {
+	    				destroyTank(x, y, x1, y1);
+	    			}
 	    			if (getCell(x, y) == Cell.wall) {
 	    				currentMap[x][y] = Cell.empty;
 	    				destroyed = true;
@@ -512,6 +515,26 @@ public class MapState implements IMap {
 		currentMap[x][y + 1] = Cell.tank;	currentMap[x + 1][y + 1] = Cell.tank;	currentMap[x + 2][y + 1] = Cell.tank;	currentMap[x + 3][y + 1] = Cell.tank;
 		currentMap[x][y + 2] = Cell.tank;	currentMap[x + 1][y + 2] = Cell.tank;	currentMap[x + 2][y + 2] = Cell.tank;	currentMap[x + 3][y + 2] = Cell.tank;
 		currentMap[x][y + 3] = Cell.tank;	currentMap[x + 1][y + 3] = Cell.tank;	currentMap[x + 2][y + 3] = Cell.tank;	currentMap[x + 3][y + 3] = Cell.tank;
+	}
+	
+	public void removeTankBlock(int x, int y) {
+		currentMap[x][y]     = Cell.empty;	currentMap[x + 1][y]     = Cell.empty;	currentMap[x + 2][y]     = Cell.empty;	currentMap[x + 3][y]     = Cell.empty;
+		currentMap[x][y + 1] = Cell.empty;	currentMap[x + 1][y + 1] = Cell.empty;	currentMap[x + 2][y + 1] = Cell.empty;	currentMap[x + 3][y + 1] = Cell.empty;
+		currentMap[x][y + 2] = Cell.empty;	currentMap[x + 1][y + 2] = Cell.empty;	currentMap[x + 2][y + 2] = Cell.empty;	currentMap[x + 3][y + 2] = Cell.empty;
+		currentMap[x][y + 3] = Cell.empty;	currentMap[x + 1][y + 3] = Cell.empty;	currentMap[x + 2][y + 3] = Cell.empty;	currentMap[x + 3][y + 3] = Cell.empty;
+	}
+	
+	public void destroyTank(int x, int y, int x1, int y1) {
+		for (TankState tank : enemies) {
+			int tankXCell = tank.getX() / 10;
+			int tankYCell = tank.getY() / 10;
+			
+			if (x >= tankXCell && x <= tankXCell + 3 && y >= tankYCell && y <= tankYCell + 3
+				|| x1 >= tankXCell && x1 <= tankXCell + 3 && y1 >= tankYCell && y1 <= tankYCell + 3) {
+				enemies.remove(tank);
+				removeTankBlock(tankXCell, tankYCell);
+			}
+		}
 	}
 
 	public boolean isGameOver() {

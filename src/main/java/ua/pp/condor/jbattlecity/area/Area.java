@@ -69,11 +69,13 @@ public class Area extends JPanel {
 		}
         
         TankState you = mapState.getYou();
-        switch (you.getOrientation()) {
-    		case UP:    g.drawImage(Images.getYouUp(),    you.getX(), you.getY(), this); break;
-        	case RIGHT: g.drawImage(Images.getYouRight(), you.getX(), you.getY(), this); break;
-        	case DOWN:  g.drawImage(Images.getYouDown(),  you.getX(), you.getY(), this); break;
-        	case LEFT:  g.drawImage(Images.getYouLeft(),  you.getX(), you.getY(), this); break;
+        if (you != null) {
+            switch (you.getOrientation()) {
+        		case UP:    g.drawImage(Images.getYouUp(),    you.getX(), you.getY(), this); break;
+            	case RIGHT: g.drawImage(Images.getYouRight(), you.getX(), you.getY(), this); break;
+            	case DOWN:  g.drawImage(Images.getYouDown(),  you.getX(), you.getY(), this); break;
+            	case LEFT:  g.drawImage(Images.getYouLeft(),  you.getX(), you.getY(), this); break;
+            }
         }
         
         for (TankState enemy : mapState.getEnemies()) {
