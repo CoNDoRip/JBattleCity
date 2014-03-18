@@ -4,11 +4,13 @@ import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
-import java.util.List;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
@@ -34,11 +36,15 @@ public class MapState implements IMap {
 	
 	private KeyEventDispatcher yourKeyEventsDispatcher;
 	
-	private List<TankState> enemies;
+	private Map<Integer, TankState> enemies;
+	
+	private int enemyId = 0;
 	
 	private Timer enemiesTimer;
 	
-	private List<ProjectileState> projectiles;
+	private Map<Integer, ProjectileState> projectiles;
+	
+	private int projectileId = 0;
 	
 	private Timer projectilesTimer;
 	
@@ -53,8 +59,8 @@ public class MapState implements IMap {
 		}
 		you = new TankState(160, 480, Orientation.UP);
 		setTankBlock(16, 48);
-		enemies = new CopyOnWriteArrayList<TankState>();
-		projectiles = new CopyOnWriteArrayList<ProjectileState>();
+		enemies = new ConcurrentHashMap<Integer, TankState>();
+		projectiles = new ConcurrentHashMap<Integer, ProjectileState>();
 		
 		yourKeyEventsDispatcher = new KeyEventDispatcher() {
 			
@@ -215,8 +221,7 @@ public class MapState implements IMap {
 
 				final int delta = 10;
 				
-				for (TankState enemy : enemies) {
-					
+				for (TankState enemy : enemies.values()) {
 					int tankX = enemy.getX();
 					int tankY = enemy.getY();
 					
@@ -369,14 +374,14 @@ public class MapState implements IMap {
 			public void run() {
 				int delta = 5;
 				
-				List<ProjectileState> projectiles = getProjectiles();
+				Set<Integer> projectilesIds = projectiles.keySet();
 				
-				for (int i = 0; i < projectiles.size(); i++) {
-					ProjectileState ps = projectiles.get(i);
+				for (Integer projectileId : projectilesIds) {
+					ProjectileState ps = projectiles.get(projectileId);
 					if (ps.getX() < Images.PROJECTILE_SIZE || ps.getX() > JBattleCity.WIDTH  - Images.PROJECTILE_SIZE - delta
 					 || ps.getY() < Images.PROJECTILE_SIZE || ps.getY() > JBattleCity.HEIGHT - Images.PROJECTILE_SIZE - delta) {
 						ps.getParent().setHasProjectile(false);
-						projectiles.remove(i);
+						projectiles.remove(projectileId);
 						continue;
 					}
 					
@@ -425,7 +430,7 @@ public class MapState implements IMap {
 					boolean destroyed = false;
 	    			if (getCell(x, y) != Cell.empty || getCell(x1, y1) != Cell.empty) {
 						ps.getParent().setHasProjectile(false);
-	    				projectiles.remove(i);
+	    				projectiles.remove(projectileId);
 	    			}
 	    			if (getCell(x, y) == Cell.base || getCell(x1, y1) == Cell.base) {
 	    				setGameOver(true);
@@ -449,7 +454,7 @@ public class MapState implements IMap {
 	    			}
 				}
 			}
-		}, 0, 15);
+		}, 0, 10);
 	}
 
 	public Cell getCell(int x, int y) {
@@ -468,32 +473,32 @@ public class MapState implements IMap {
 		this.you = you;
 	}
 
-	public List<ProjectileState> getProjectiles() {
-		return projectiles;
+	public Collection<ProjectileState> getProjectiles() {
+		return projectiles.values();
 	}
 	
 	public void addProjectile(ProjectileState projectile) {
-		projectiles.add(projectile);
+		projectiles.put(projectileId++, projectile);
 	}
 
-	public List<TankState> getEnemies() {
-		return enemies;
+	public Collection<TankState> getEnemies() {
+		return enemies.values();
 	}
 	
 	public boolean addEnemy() {
 		if (isEmptyBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0)) {
 			TankState enemy = new TankState(BLOCKS_COUNT / 2 * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
-			enemies.add(enemy);
+			enemies.put(enemyId++, enemy);
 			setTankBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0);
 			return true;
 		} else if (isEmptyBlock(0, 0)) {
 			TankState enemy = new TankState(0, 0, Orientation.DOWN);
-			enemies.add(enemy);
+			enemies.put(enemyId++, enemy);
 			setTankBlock(0, 0);
 			return true;
 		} else if (isEmptyBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0)) {
 			TankState enemy = new TankState((BLOCKS_COUNT - 1) * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
-			enemies.add(enemy);
+			enemies.put(enemyId++, enemy);
 			setTankBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0);
 			return true;
 		}
@@ -525,13 +530,16 @@ public class MapState implements IMap {
 	}
 	
 	public void destroyTank(int x, int y, int x1, int y1) {
-		for (TankState tank : enemies) {
+		Set<Integer> enemiesIds = enemies.keySet();
+		for (Integer enemyId : enemiesIds) {
+			TankState tank = enemies.get(enemyId);
+			
 			int tankXCell = tank.getX() / 10;
 			int tankYCell = tank.getY() / 10;
 			
 			if (x >= tankXCell && x <= tankXCell + 3 && y >= tankYCell && y <= tankYCell + 3
 				|| x1 >= tankXCell && x1 <= tankXCell + 3 && y1 >= tankYCell && y1 <= tankYCell + 3) {
-				enemies.remove(tank);
+				enemies.remove(enemyId);
 				removeTankBlock(tankXCell, tankYCell);
 			}
 		}
