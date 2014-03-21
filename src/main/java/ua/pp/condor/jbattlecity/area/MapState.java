@@ -553,7 +553,7 @@ public class MapState implements IMap {
 		if (x >= tankXCell && x <= tankXCell + 3 && y >= tankYCell && y <= tankYCell + 3
 			|| x1 >= tankXCell && x1 <= tankXCell + 3 && y1 >= tankYCell && y1 <= tankYCell + 3) {
 			removeTankBlock(tankXCell, tankYCell);
-			you = null;
+			you.setOrientation(null);
 			setGameOver(true);
 		}
 	}

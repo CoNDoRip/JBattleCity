@@ -21,6 +21,11 @@ public class Images {
 	
 	private static final String PROJECTILE  = "/img/projectile.gif";
 	public static final int PROJECTILE_SIZE  = 3;
+
+	private static final String BANG_0  = "/img/bang0.gif";
+	private static final String BANG_1  = "/img/bang1.gif";
+	private static final String BANG_2  = "/img/bang2.gif";
+	private static final String BANG_3  = "/img/bang3.gif";
 	
 	private static final String GAME_OVER  = "/img/game_over.gif";
 
@@ -37,6 +42,11 @@ public class Images {
 	private static Image enemyLeft;
 	
 	private static Image projectile;
+
+	private static Image bang0;
+	private static Image bang1;
+	private static Image bang2;
+	private static Image bang3;
 	
 	private static Image gameOver;
 	
@@ -108,6 +118,24 @@ public class Images {
 		if (projectile == null)
 			projectile = getImage(PROJECTILE);
 		return projectile;
+	}
+
+	public static Image getBang(int i) {
+		switch (i) {
+			case 0: if (bang0 == null)
+						bang0 = getImage(BANG_0);
+					return bang0;
+			case 1: if (bang1 == null)
+						bang1 = getImage(BANG_1);
+					return bang1;
+			case 2: if (bang2 == null)
+						bang2 = getImage(BANG_2);
+					return bang2;
+			case 3: if (bang3 == null)
+						bang3 = getImage(BANG_3);
+					return bang3;
+			default: return null;
+		}
 	}
 
 	public static Image getGameOver() {
