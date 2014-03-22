@@ -13,6 +13,7 @@ import ua.pp.condor.jbattlecity.area.maps.IMap;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.utils.Images;
+import ua.pp.condor.jbattlecity.utils.Sound;
 
 public class Area extends JPanel {
 
@@ -33,7 +34,7 @@ public class Area extends JPanel {
 				repaint();
 			}
 		}).start();
-        
+		
         MediaTracker mt = new MediaTracker(this);
         mt.addImage(mapState.getMapImage(), 1);
         mt.addImage(Images.getYouUp(), 2);
@@ -50,7 +51,6 @@ public class Area extends JPanel {
         mt.addImage(Images.getBang(2), 5);
         mt.addImage(Images.getBang(3), 5);
         mt.addImage(Images.getGameOver(), 9);
-        
         try {
 			mt.waitForAll();
 		} catch (InterruptedException e1) {
@@ -58,6 +58,8 @@ public class Area extends JPanel {
 		}
         if (mt.isErrorAny())
         	throw new IllegalStateException("Errors in images loading");
+        
+        Sound.getBackground().loop();
 	}
 
 	@Override

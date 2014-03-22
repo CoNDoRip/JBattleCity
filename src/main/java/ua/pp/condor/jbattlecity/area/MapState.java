@@ -18,6 +18,7 @@ import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.utils.Images;
+import ua.pp.condor.jbattlecity.utils.Sound;
 
 public class MapState implements IMap {
 	
@@ -196,6 +197,8 @@ public class MapState implements IMap {
 							}
 							ps.setParent(you);
 							addProjectile(ps);
+							
+							Sound.getFire().play();
 						}
 					}
 					
@@ -451,6 +454,8 @@ public class MapState implements IMap {
 	    					currentMap[x2][y2] = Cell.empty;
 	    				if (getCell(x3, y3) == Cell.wall)
 	    					currentMap[x3][y3] = Cell.empty;
+	    				
+	    				Sound.getBrick().play();
 	    			}
 				}
 			}
@@ -525,6 +530,7 @@ public class MapState implements IMap {
 	}
 	
 	public void removeTankBlock(int x, int y) {
+		Sound.getExplosion().play();
 		synchronized (currentMap) {
 			currentMap[x][y]     = Cell.empty;	currentMap[x + 1][y]     = Cell.empty;	currentMap[x + 2][y]     = Cell.empty;	currentMap[x + 3][y]     = Cell.empty;
 			currentMap[x][y + 1] = Cell.empty;	currentMap[x + 1][y + 1] = Cell.empty;	currentMap[x + 2][y + 1] = Cell.empty;	currentMap[x + 3][y + 1] = Cell.empty;
@@ -567,6 +573,8 @@ public class MapState implements IMap {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventsDispatcher);
 		enemiesTimer.cancel();
 		projectilesTimer.cancel();
+		Sound.getBackground().stop();
+		Sound.getGameOver().play();
 	}
 
 }
