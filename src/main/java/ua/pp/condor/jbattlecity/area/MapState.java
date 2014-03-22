@@ -245,15 +245,17 @@ public class MapState implements IMap {
 									&& getCell(oldXCell + 3, decYCell) == Cell.empty) {
 								tankY -= delta;
 								
-								currentMap[oldXCell][decYCell] = Cell.tank;
-								currentMap[oldXCell + 1][decYCell] = Cell.tank;
-								currentMap[oldXCell + 2][decYCell] = Cell.tank;
-								currentMap[oldXCell + 3][decYCell] = Cell.tank;
-								
-								currentMap[oldXCell][decYCell + 4] = Cell.empty;
-								currentMap[oldXCell + 1][decYCell + 4] = Cell.empty;
-								currentMap[oldXCell + 2][decYCell + 4] = Cell.empty;
-								currentMap[oldXCell + 3][decYCell + 4] = Cell.empty;
+								synchronized (currentMap) {
+									currentMap[oldXCell][decYCell + 4] = Cell.empty;
+									currentMap[oldXCell + 1][decYCell + 4] = Cell.empty;
+									currentMap[oldXCell + 2][decYCell + 4] = Cell.empty;
+									currentMap[oldXCell + 3][decYCell + 4] = Cell.empty;
+									
+									currentMap[oldXCell][decYCell] = Cell.tank;
+									currentMap[oldXCell + 1][decYCell] = Cell.tank;
+									currentMap[oldXCell + 2][decYCell] = Cell.tank;
+									currentMap[oldXCell + 3][decYCell] = Cell.tank;
+								}
 
 								moved = true;
 							}
@@ -266,16 +268,18 @@ public class MapState implements IMap {
 									&& getCell(incXCell + 3, oldYCell + 2) == Cell.empty
 									&& getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
 								tankX += delta;
-								
-								currentMap[incXCell + 3][oldYCell] = Cell.tank;
-								currentMap[incXCell + 3][oldYCell + 1] = Cell.tank;
-								currentMap[incXCell + 3][oldYCell + 2] = Cell.tank;
-								currentMap[incXCell + 3][oldYCell + 3] = Cell.tank;
-								
-								currentMap[oldXCell][oldYCell] = Cell.empty;
-								currentMap[oldXCell][oldYCell + 1] = Cell.empty;
-								currentMap[oldXCell][oldYCell + 2] = Cell.empty;
-								currentMap[oldXCell][oldYCell + 3] = Cell.empty;
+
+								synchronized (currentMap) {
+									currentMap[oldXCell][oldYCell] = Cell.empty;
+									currentMap[oldXCell][oldYCell + 1] = Cell.empty;
+									currentMap[oldXCell][oldYCell + 2] = Cell.empty;
+									currentMap[oldXCell][oldYCell + 3] = Cell.empty;
+									
+									currentMap[incXCell + 3][oldYCell] = Cell.tank;
+									currentMap[incXCell + 3][oldYCell + 1] = Cell.tank;
+									currentMap[incXCell + 3][oldYCell + 2] = Cell.tank;
+									currentMap[incXCell + 3][oldYCell + 3] = Cell.tank;
+								}
 
 								moved = true;
 							}
@@ -288,16 +292,18 @@ public class MapState implements IMap {
 									&& getCell(oldXCell + 2, incYCell + 3) == Cell.empty
 									&& getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
 								tankY += delta;
-								
-								currentMap[oldXCell][incYCell + 3] = Cell.tank;
-								currentMap[oldXCell + 1][incYCell + 3] = Cell.tank;
-								currentMap[oldXCell + 2][incYCell + 3] = Cell.tank;
-								currentMap[oldXCell + 3][incYCell + 3] = Cell.tank;
-								
-								currentMap[oldXCell][oldYCell] = Cell.empty;
-								currentMap[oldXCell + 1][oldYCell] = Cell.empty;
-								currentMap[oldXCell + 2][oldYCell] = Cell.empty;
-								currentMap[oldXCell + 3][oldYCell] = Cell.empty;
+
+								synchronized (currentMap) {
+									currentMap[oldXCell][oldYCell] = Cell.empty;
+									currentMap[oldXCell + 1][oldYCell] = Cell.empty;
+									currentMap[oldXCell + 2][oldYCell] = Cell.empty;
+									currentMap[oldXCell + 3][oldYCell] = Cell.empty;
+									
+									currentMap[oldXCell][incYCell + 3] = Cell.tank;
+									currentMap[oldXCell + 1][incYCell + 3] = Cell.tank;
+									currentMap[oldXCell + 2][incYCell + 3] = Cell.tank;
+									currentMap[oldXCell + 3][incYCell + 3] = Cell.tank;
+								}
 
 								moved = true;
 							}
@@ -310,16 +316,18 @@ public class MapState implements IMap {
 									&& getCell(decXCell, oldYCell + 2) == Cell.empty
 									&& getCell(decXCell, oldYCell + 3) == Cell.empty) {
 								tankX -= delta;
-								
-								currentMap[decXCell][oldYCell] = Cell.tank;
-								currentMap[decXCell][oldYCell + 1] = Cell.tank;
-								currentMap[decXCell][oldYCell + 2] = Cell.tank;
-								currentMap[decXCell][oldYCell + 3] = Cell.tank;
-								
-								currentMap[decXCell + 4][oldYCell] = Cell.empty;
-								currentMap[decXCell + 4][oldYCell + 1] = Cell.empty;
-								currentMap[decXCell + 4][oldYCell + 2] = Cell.empty;
-								currentMap[decXCell + 4][oldYCell + 3] = Cell.empty;
+
+								synchronized (currentMap) {
+									currentMap[decXCell + 4][oldYCell] = Cell.empty;
+									currentMap[decXCell + 4][oldYCell + 1] = Cell.empty;
+									currentMap[decXCell + 4][oldYCell + 2] = Cell.empty;
+									currentMap[decXCell + 4][oldYCell + 3] = Cell.empty;
+									
+									currentMap[decXCell][oldYCell] = Cell.tank;
+									currentMap[decXCell][oldYCell + 1] = Cell.tank;
+									currentMap[decXCell][oldYCell + 2] = Cell.tank;
+									currentMap[decXCell][oldYCell + 3] = Cell.tank;
+								}
 
 								moved = true;
 							}

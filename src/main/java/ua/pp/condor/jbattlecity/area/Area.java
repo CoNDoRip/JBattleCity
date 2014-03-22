@@ -71,7 +71,7 @@ public class Area extends JPanel {
         g.setColor(Color.BLACK);
         for (int x = 0; x < MapState.ARRAY_SIZE; x++) {
 			for (int y = 0; y < MapState.ARRAY_SIZE; y++) {
-				if (mapState.getCell(x, y) == Cell.empty)
+				if (mapState.getCell(x, y) == Cell.empty || mapState.getCell(x, y) == Cell.tank)
 					g.fillRect(x * 10, y * 10, 10, 10);
 			}
 		}
