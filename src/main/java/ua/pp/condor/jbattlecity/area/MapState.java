@@ -14,9 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
+import ua.pp.condor.jbattlecity.tank.EnemyTankState;
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
+import ua.pp.condor.jbattlecity.tank.YouTankState;
 import ua.pp.condor.jbattlecity.utils.Images;
 import ua.pp.condor.jbattlecity.utils.Sound;
 
@@ -29,15 +31,15 @@ public class MapState implements IMap {
 	
 	public static final int ARRAY_SIZE = BLOCKS_COUNT * BLOCK_SIZE;
 	
-	private static Cell[][] currentMap = new Cell[ARRAY_SIZE][ARRAY_SIZE];
+	private Cell[][] currentMap = new Cell[ARRAY_SIZE][ARRAY_SIZE];
 	
 	private IMap map;
 	
-	private TankState you;
+	private YouTankState you;
 	
 	private KeyEventDispatcher yourKeyEventsDispatcher;
 	
-	private Map<Integer, TankState> enemies;
+	private Map<Integer, EnemyTankState> enemies;
 	
 	private int enemyId = 0;
 	
@@ -49,6 +51,8 @@ public class MapState implements IMap {
 	
 	private Timer projectilesTimer;
 	
+	private boolean gameStarted = false;
+	
 	private boolean gameOver;
 	
 	public MapState(IMap map) {
@@ -58,18 +62,20 @@ public class MapState implements IMap {
 				currentMap[x][y] = map.getCell(x, y);
 			}
 		}
-		you = new TankState(160, 480, Orientation.UP);
+		you = new YouTankState(160, 480, Orientation.UP);
 		setTankBlock(16, 48);
-		enemies = new ConcurrentHashMap<Integer, TankState>();
+		enemies = new ConcurrentHashMap<Integer, EnemyTankState>();
 		projectiles = new ConcurrentHashMap<Integer, ProjectileState>();
 		
 		yourKeyEventsDispatcher = new KeyEventDispatcher() {
 			
 			public boolean dispatchKeyEvent(KeyEvent arg0) {
 				if (arg0.getID() == KeyEvent.KEY_PRESSED) {
+					if (!isGameStarted()) return false;
+					
 					final int delta = 10;
 					
-					TankState you = getYou();
+					YouTankState you = getYou();
 					
 					int tankX = you.getX();
 					int tankY = you.getY();
@@ -218,6 +224,8 @@ public class MapState implements IMap {
 			
 			@Override
 			public void run() {
+				if (!isGameStarted()) return;
+				
 				if (enemies.size() < 3) {
 					addEnemy();
 				}
@@ -478,11 +486,11 @@ public class MapState implements IMap {
 		return map.getMapImage();
 	}
 
-	public TankState getYou() {
+	public YouTankState getYou() {
 		return you;
 	}
 
-	public void setYou(TankState you) {
+	public void setYou(YouTankState you) {
 		this.you = you;
 	}
 
@@ -494,23 +502,23 @@ public class MapState implements IMap {
 		projectiles.put(projectileId++, projectile);
 	}
 
-	public Collection<TankState> getEnemies() {
+	public Collection<EnemyTankState> getEnemies() {
 		return enemies.values();
 	}
 	
 	public boolean addEnemy() {
 		if (isEmptyBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0)) {
-			TankState enemy = new TankState(BLOCKS_COUNT / 2 * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
+			EnemyTankState enemy = new EnemyTankState(BLOCKS_COUNT / 2 * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
 			enemies.put(enemyId++, enemy);
 			setTankBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0);
 			return true;
 		} else if (isEmptyBlock(0, 0)) {
-			TankState enemy = new TankState(0, 0, Orientation.DOWN);
+			EnemyTankState enemy = new EnemyTankState(0, 0, Orientation.DOWN);
 			enemies.put(enemyId++, enemy);
 			setTankBlock(0, 0);
 			return true;
 		} else if (isEmptyBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0)) {
-			TankState enemy = new TankState((BLOCKS_COUNT - 1) * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
+			EnemyTankState enemy = new EnemyTankState((BLOCKS_COUNT - 1) * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
 			enemies.put(enemyId++, enemy);
 			setTankBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0);
 			return true;
@@ -570,6 +578,14 @@ public class MapState implements IMap {
 			you.setOrientation(null);
 			setGameOver(true);
 		}
+	}
+
+	public boolean isGameStarted() {
+		return gameStarted;
+	}
+
+	public void setGameStarted(boolean gameStarted) {
+		this.gameStarted = gameStarted;
 	}
 
 	public boolean isGameOver() {

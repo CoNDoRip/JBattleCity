@@ -5,6 +5,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import ua.pp.condor.jbattlecity.tank.Orientation;
+import ua.pp.condor.jbattlecity.tank.TankColor;
+
 public class Images {
 	
 	private static final String STAGE_1 = "/img/stage_1.gif";
@@ -18,6 +21,11 @@ public class Images {
 	private static final String ENEMY_RIGHT = "/img/enemy_right.gif";
 	private static final String ENEMY_DOWN  = "/img/enemy_down.gif";
 	private static final String ENEMY_LEFT  = "/img/enemy_left.gif";
+
+	private static final String FRIEND_UP    = "/img/friend_up.gif";
+	private static final String FRIEND_RIGHT = "/img/friend_right.gif";
+	private static final String FRIEND_DOWN  = "/img/friend_down.gif";
+	private static final String FRIEND_LEFT  = "/img/friend_left.gif";
 	
 	private static final String PROJECTILE  = "/img/projectile.gif";
 	public static final int PROJECTILE_SIZE  = 3;
@@ -40,6 +48,11 @@ public class Images {
 	private static Image enemyRight;
 	private static Image enemyDown;
 	private static Image enemyLeft;
+
+	private static Image friendUp;
+	private static Image friendRight;
+	private static Image friendDown;
+	private static Image friendLeft;
 	
 	private static Image projectile;
 
@@ -114,6 +127,30 @@ public class Images {
 		return enemyLeft;
 	}
 
+	public static Image getFriendUp() {
+		if (friendUp == null)
+			friendUp = getImage(FRIEND_UP);
+		return friendUp;
+	}
+
+	public static Image getFriendRight() {
+		if (friendRight == null)
+			friendRight = getImage(FRIEND_RIGHT);
+		return friendRight;
+	}
+
+	public static Image getFriendDown() {
+		if (friendDown == null)
+			friendDown = getImage(FRIEND_DOWN);
+		return friendDown;
+	}
+
+	public static Image getFriendLeft() {
+		if (friendLeft == null)
+			friendLeft = getImage(FRIEND_LEFT);
+		return friendLeft;
+	}
+
 	public static Image getProjectile() {
 		if (projectile == null)
 			projectile = getImage(PROJECTILE);
@@ -142,6 +179,44 @@ public class Images {
 		if (gameOver == null)
 			gameOver = getImage(GAME_OVER);
 		return gameOver;
+	}
+	
+	public static Image getTankImage(Orientation orientation, TankColor color) {
+		switch (orientation) {
+			case UP: {
+				switch (color) {
+					case YELLOW: return getYouUp();
+					case GREY: return getEnemyUp();
+					case GREEN: return getFriendUp();
+				}
+				break;
+			}
+	    	case RIGHT: {
+				switch (color) {
+					case YELLOW: return getYouRight();
+					case GREY: return getEnemyRight();
+					case GREEN: return getFriendRight();
+				}
+				break;
+			}
+	    	case DOWN: {
+				switch (color) {
+					case YELLOW: return getYouDown();
+					case GREY: return getEnemyDown();
+					case GREEN: return getFriendDown();
+				}
+				break;
+			}
+	    	case LEFT: {
+				switch (color) {
+					case YELLOW: return getYouLeft();
+					case GREY: return getEnemyLeft();
+					case GREEN: return getFriendLeft();
+				}
+				break;
+			}
+		}
+		return null;
 	}
 
 }

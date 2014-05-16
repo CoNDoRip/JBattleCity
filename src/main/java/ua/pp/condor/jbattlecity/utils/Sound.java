@@ -6,12 +6,12 @@ import java.net.URL;
 
 public class Sound {
 
-	private static final String GAME_START = "sound/gamestart.wav";
-	private static final String BACKGROUND = "sound/background.wav";
-	private static final String BRICK = "sound/brick.wav";
-	private static final String FIRE = "sound/fire.wav";
-	private static final String EXPLOSION = "sound/explosion.wav";
-	private static final String GAME_OVER = "sound/gameover.wav";
+	private static final String GAME_START = "sound/gamestart.au";
+	private static final String BACKGROUND = "sound/background.au";
+	private static final String BRICK = "sound/brick.au";
+	private static final String FIRE = "sound/fire.au";
+	private static final String EXPLOSION = "sound/explosion.au";
+	private static final String GAME_OVER = "sound/gameover.au";
 
 	private static AudioClip gameStart;
 	private static AudioClip background;

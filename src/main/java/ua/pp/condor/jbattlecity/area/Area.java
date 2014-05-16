@@ -5,13 +5,15 @@ import java.awt.Graphics;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.TimerTask;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import ua.pp.condor.jbattlecity.area.maps.IMap;
+import ua.pp.condor.jbattlecity.tank.EnemyTankState;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
-import ua.pp.condor.jbattlecity.tank.TankState;
+import ua.pp.condor.jbattlecity.tank.YouTankState;
 import ua.pp.condor.jbattlecity.utils.Images;
 import ua.pp.condor.jbattlecity.utils.Sound;
 
@@ -28,12 +30,12 @@ public class Area extends JPanel {
 		
 		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		
-        new Timer(10, new ActionListener() {
+        final Timer repaintTimer = new Timer(10, new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 				repaint();
 			}
-		}).start();
+		});
 		
         MediaTracker mt = new MediaTracker(this);
         mt.addImage(mapState.getMapImage(), 1);
@@ -45,11 +47,15 @@ public class Area extends JPanel {
         mt.addImage(Images.getEnemyRight(), 3);
         mt.addImage(Images.getEnemyDown(), 3);
         mt.addImage(Images.getEnemyLeft(), 3);
-        mt.addImage(Images.getProjectile(), 4);
-        mt.addImage(Images.getBang(0), 5);
-        mt.addImage(Images.getBang(1), 5);
-        mt.addImage(Images.getBang(2), 5);
-        mt.addImage(Images.getBang(3), 5);
+        mt.addImage(Images.getFriendUp(), 4);
+        mt.addImage(Images.getFriendRight(), 4);
+        mt.addImage(Images.getFriendDown(), 4);
+        mt.addImage(Images.getFriendLeft(), 4);
+        mt.addImage(Images.getProjectile(), 5);
+        mt.addImage(Images.getBang(0), 6);
+        mt.addImage(Images.getBang(1), 6);
+        mt.addImage(Images.getBang(2), 6);
+        mt.addImage(Images.getBang(3), 6);
         mt.addImage(Images.getGameOver(), 9);
         try {
 			mt.waitForAll();
@@ -59,7 +65,16 @@ public class Area extends JPanel {
         if (mt.isErrorAny())
         	throw new IllegalStateException("Errors in images loading");
         
-        Sound.getBackground().loop();
+        Sound.getGameStart().play();
+        new java.util.Timer().schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				repaintTimer.start();
+				mapState.setGameStarted(true);
+		        Sound.getBackground().loop();
+			}
+		}, 4000);
 	}
 
 	@Override
@@ -76,28 +91,17 @@ public class Area extends JPanel {
 			}
 		}
         
-        TankState you = mapState.getYou();
+        YouTankState you = mapState.getYou();
         if (you.getOrientation() != null) {
-            switch (you.getOrientation()) {
-        		case UP:    g.drawImage(Images.getYouUp(),    you.getX(), you.getY(), this); break;
-            	case RIGHT: g.drawImage(Images.getYouRight(), you.getX(), you.getY(), this); break;
-            	case DOWN:  g.drawImage(Images.getYouDown(),  you.getX(), you.getY(), this); break;
-            	case LEFT:  g.drawImage(Images.getYouLeft(),  you.getX(), you.getY(), this); break;
-            	default:    
-            }
+        	g.drawImage(Images.getTankImage(you.getOrientation(), you.getTankColor()), you.getX(), you.getY(), this);
         } else {
         	g.drawImage(Images.getBang(currentBang), you.getX(), you.getY(), this);
             if (currentBang < 4) currentBang++;
             else currentBang = 0;
         }
         
-        for (TankState enemy : mapState.getEnemies()) {
-        	switch (enemy.getOrientation()) {
-	    		case UP:    g.drawImage(Images.getEnemyUp(),    enemy.getX(), enemy.getY(), this); break;
-	        	case RIGHT: g.drawImage(Images.getEnemyRight(), enemy.getX(), enemy.getY(), this); break;
-	        	case DOWN:  g.drawImage(Images.getEnemyDown(),  enemy.getX(), enemy.getY(), this); break;
-	        	case LEFT:  g.drawImage(Images.getEnemyLeft(),  enemy.getX(), enemy.getY(), this); break;
-        	}
+        for (EnemyTankState enemy : mapState.getEnemies()) {
+        	g.drawImage(Images.getTankImage(enemy.getOrientation(), enemy.getTankColor()), enemy.getX(), enemy.getY(), this);
         }
         
         for (ProjectileState ps : mapState.getProjectiles()) {
