@@ -9,16 +9,17 @@ import ua.pp.condor.jbattlecity.utils.Sound;
 
 public class JBattleCity extends JApplet {
 
-	private static final long serialVersionUID = -6680546851758395165L;
-	
-	public static final int WIDTH = 520;
-	public static final int HEIGHT = 520;
+    private static final long serialVersionUID = -6680546851758395165L;
+    
+    public static final int WIDTH = 520;
+    public static final int HEIGHT = 520;
 
-	@Override
+    @Override
     public void init() {
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
 
+                @Override
                 public void run() {
                     makeGUI();
                 }
@@ -29,9 +30,9 @@ public class JBattleCity extends JApplet {
     }
 
     private void makeGUI() {
-    	setSize(WIDTH, HEIGHT);
-    	new Sound(this);
-    	add(new Area(new Stage1()));
+        setSize(WIDTH, HEIGHT);
+        Sound.load(this);
+        add(new Area(new Stage1()));
     }
 
 }
