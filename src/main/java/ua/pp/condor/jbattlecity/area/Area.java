@@ -19,24 +19,25 @@ import ua.pp.condor.jbattlecity.utils.Sound;
 
 public class Area extends JPanel {
 
-	private static final long serialVersionUID = -2993932675117489481L;
-	
-	private MapState mapState;
-	
-	private int currentBang = 0;
-	
-	public Area(IMap map) {
-		mapState = new MapState(map);
-		
-		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-		
+    private static final long serialVersionUID = -2993932675117489481L;
+    
+    private final MapState mapState;
+    
+    private int currentBang;
+    
+    public Area(IMap map) {
+        mapState = new MapState(map);
+        
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+        
         final Timer repaintTimer = new Timer(10, new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				repaint();
-			}
-		});
-		
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                repaint();
+            }
+        });
+        
         MediaTracker mt = new MediaTracker(this);
         mt.addImage(mapState.getMapImage(), 1);
         mt.addImage(Images.getYouUp(), 2);
@@ -58,26 +59,28 @@ public class Area extends JPanel {
         mt.addImage(Images.getBang(3), 6);
         mt.addImage(Images.getGameOver(), 9);
         try {
-			mt.waitForAll();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
+            mt.waitForAll();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
         if (mt.isErrorAny())
-        	throw new IllegalStateException("Errors in images loading");
+            throw new IllegalStateException("Errors in images loading");
         
         Sound.getGameStart().play();
         new java.util.Timer().schedule(new TimerTask() {
-			
-			@Override
-			public void run() {
-				repaintTimer.start();
-				mapState.startGame();
-		        Sound.getBackground().loop();
-			}
-		}, 4000);
-	}
+            
+            @Override
+            public void run() {
+                repaintTimer.start();
+                mapState.startGame();
+                Sound.getBackground().loop();
+            }
+        }, 4000);
+        
+        currentBang = 0;
+    }
 
-	@Override
+    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -85,31 +88,31 @@ public class Area extends JPanel {
 
         g.setColor(Color.BLACK);
         for (int x = 0; x < MapState.ARRAY_SIZE; x++) {
-			for (int y = 0; y < MapState.ARRAY_SIZE; y++) {
-				if (mapState.getCell(x, y) == Cell.empty || mapState.getCell(x, y) == Cell.tank)
-					g.fillRect(x * 10, y * 10, 10, 10);
-			}
-		}
+            for (int y = 0; y < MapState.ARRAY_SIZE; y++) {
+                if (mapState.getCell(x, y) == Cell.empty || mapState.getCell(x, y) == Cell.tank)
+                    g.fillRect(x * 10, y * 10, 10, 10);
+            }
+        }
         
         YouTankState you = mapState.getYou();
         if (you.getOrientation() != null) {
-        	g.drawImage(Images.getTankImage(you.getOrientation(), you.getTankColor()), you.getX(), you.getY(), this);
+            g.drawImage(Images.getTankImage(you.getOrientation(), you.getTankColor()), you.getX(), you.getY(), this);
         } else {
-        	g.drawImage(Images.getBang(currentBang), you.getX(), you.getY(), this);
+            g.drawImage(Images.getBang(currentBang), you.getX(), you.getY(), this);
             if (currentBang < 4) currentBang++;
             else currentBang = 0;
         }
         
         for (EnemyTankState enemy : mapState.getEnemies()) {
-        	g.drawImage(Images.getTankImage(enemy.getOrientation(), enemy.getTankColor()), enemy.getX(), enemy.getY(), this);
+            g.drawImage(Images.getTankImage(enemy.getOrientation(), enemy.getTankColor()), enemy.getX(), enemy.getY(), this);
         }
         
         for (ProjectileState ps : mapState.getProjectiles()) {
-        	g.drawImage(Images.getProjectile(), ps.getX() - Images.PROJECTILE_SIZE, ps.getY() - Images.PROJECTILE_SIZE, this);
+            g.drawImage(Images.getProjectile(), ps.getX() - Images.PROJECTILE_SIZE, ps.getY() - Images.PROJECTILE_SIZE, this);
         }
 
-		if (mapState.isGameOver())
-	        g.drawImage(Images.getGameOver(), 110, 160, this);
+        if (mapState.isGameOver())
+            g.drawImage(Images.getGameOver(), 110, 160, this);
     }
-	
+    
 }

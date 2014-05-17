@@ -4,7 +4,7 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import java.net.URL;
 
-public class Sound {
+public final class Sound {
 
     private static final String GAME_START = "sound/gamestart.au";
     private static final String BACKGROUND = "sound/background.au";
@@ -19,7 +19,10 @@ public class Sound {
     private static AudioClip fire;
     private static AudioClip explosion;
     private static AudioClip gameOver;
-    
+
+    private Sound() {
+    }
+
     public static void load(Applet applet) {
         URL codeBase = applet.getCodeBase();
         gameStart = applet.getAudioClip(codeBase, GAME_START);

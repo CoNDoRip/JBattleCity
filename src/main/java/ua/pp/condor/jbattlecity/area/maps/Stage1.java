@@ -6,9 +6,9 @@ import ua.pp.condor.jbattlecity.area.Cell;
 import ua.pp.condor.jbattlecity.utils.Images;
 
 public class Stage1 implements IMap {
-	
-	private static final Cell[][] map = new Cell[][] {
-		/*                      1                                                  2                                                  3                                                  4                                                  5                                                  6                                                 7                                                   8                                                  9                                                 10                                                 11                                                 12                                                  13                     */
+    
+    private static final Cell[][] map = {
+        /*                      1                                                  2                                                  3                                                  4                                                  5                                                  6                                                 7                                                   8                                                  9                                                 10                                                 11                                                 12                                                  13                     */
         {Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty},
 /*1*/   {Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty},
         {Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty},
@@ -73,14 +73,16 @@ public class Stage1 implements IMap {
 /*13*/  {Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.wall,  Cell.wall,     Cell.base,  Cell.base,  Cell.base,  Cell.base,     Cell.wall,  Cell.wall,  Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty},
         {Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.wall,  Cell.wall,     Cell.base,  Cell.base,  Cell.base,  Cell.base,     Cell.wall,  Cell.wall,  Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty},
         {Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.wall,  Cell.wall,     Cell.base,  Cell.base,  Cell.base,  Cell.base,     Cell.wall,  Cell.wall,  Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty,    Cell.empty, Cell.empty, Cell.empty, Cell.empty},
-	};
+    };
 
-	public Cell getCell(int x, int y) {
-		return map[y][x];
-	}
-	
-	public Image getMapImage() {
-		return Images.getStage1();
-	}
+    @Override
+    public Cell getCell(int x, int y) {
+        return map[y][x];
+    }
+    
+    @Override
+    public Image getMapImage() {
+        return Images.getStage1();
+    }
 
 }
