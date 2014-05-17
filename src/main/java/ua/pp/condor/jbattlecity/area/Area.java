@@ -71,7 +71,7 @@ public class Area extends JPanel {
 			@Override
 			public void run() {
 				repaintTimer.start();
-				mapState.setGameStarted(true);
+				mapState.startGame();
 		        Sound.getBackground().loop();
 			}
 		}, 4000);

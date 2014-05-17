@@ -1,26 +1,24 @@
 package ua.pp.condor.jbattlecity.area;
 
-import java.awt.Image;
-import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.KeyEvent;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-
-import ua.pp.condor.jbattlecity.JBattleCity;
+import ua.pp.condor.jbattlecity.area.actions.EnemiesTimerTask;
+import ua.pp.condor.jbattlecity.area.actions.ProjectilesTimerTask;
+import ua.pp.condor.jbattlecity.area.actions.YourKeyEventsDispatcher;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
 import ua.pp.condor.jbattlecity.tank.EnemyTankState;
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.tank.YouTankState;
-import ua.pp.condor.jbattlecity.utils.Images;
 import ua.pp.condor.jbattlecity.utils.Sound;
+
+import java.awt.Image;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MapState implements IMap {
 	
@@ -31,27 +29,25 @@ public class MapState implements IMap {
 	
 	public static final int ARRAY_SIZE = BLOCKS_COUNT * BLOCK_SIZE;
 	
-	private Cell[][] currentMap = new Cell[ARRAY_SIZE][ARRAY_SIZE];
+	private final Cell[][] currentMap = new Cell[ARRAY_SIZE][ARRAY_SIZE];
 	
-	private IMap map;
+	private final IMap map;
 	
 	private YouTankState you;
 	
-	private KeyEventDispatcher yourKeyEventsDispatcher;
+	private final KeyEventDispatcher yourKeyEventsDispatcher;
 	
-	private Map<Integer, EnemyTankState> enemies;
+	private final Map<Integer, EnemyTankState> enemies;
 	
-	private int enemyId = 0;
+	private int enemyId;
 	
-	private Timer enemiesTimer;
+	private final Timer enemiesTimer;
 	
-	private Map<Integer, ProjectileState> projectiles;
+	private final Map<Integer, ProjectileState> projectiles;
 	
-	private int projectileId = 0;
+	private int projectileId;
 	
-	private Timer projectilesTimer;
-	
-	private boolean gameStarted = false;
+	private final Timer projectilesTimer;
 	
 	private boolean gameOver;
 	
@@ -66,422 +62,20 @@ public class MapState implements IMap {
 		setTankBlock(16, 48);
 		enemies = new ConcurrentHashMap<Integer, EnemyTankState>();
 		projectiles = new ConcurrentHashMap<Integer, ProjectileState>();
+        enemyId = 0;
+        projectileId = 0;
 		
-		yourKeyEventsDispatcher = new KeyEventDispatcher() {
-			
-			public boolean dispatchKeyEvent(KeyEvent arg0) {
-				if (arg0.getID() == KeyEvent.KEY_PRESSED) {
-					if (!isGameStarted()) return false;
-					
-					final int delta = 10;
-					
-					YouTankState you = getYou();
-					
-					int tankX = you.getX();
-					int tankY = you.getY();
-					
-					int oldXCell = tankX / 10;
-					int incXCell = (tankX + delta) / 10;
-					int decXCell = (tankX - delta) / 10;
-					int oldYCell = tankY / 10;
-					int incYCell = (tankY + delta) / 10;
-					int decYCell = (tankY - delta) / 10;
-					
-					switch (arg0.getKeyCode()) {
-						case KeyEvent.VK_UP: {
-							you.setOrientation(Orientation.UP);
-							if (tankY - delta >= 0
-									&& getCell(oldXCell, decYCell) == Cell.empty
-									&& getCell(oldXCell + 1, decYCell) == Cell.empty
-									&& getCell(oldXCell + 2, decYCell) == Cell.empty
-									&& getCell(oldXCell + 3, decYCell) == Cell.empty) {
-								tankY -= delta;
-								
-								currentMap[oldXCell][decYCell] = Cell.tank;
-								currentMap[oldXCell + 1][decYCell] = Cell.tank;
-								currentMap[oldXCell + 2][decYCell] = Cell.tank;
-								currentMap[oldXCell + 3][decYCell] = Cell.tank;
-								
-								currentMap[oldXCell][decYCell + 4] = Cell.empty;
-								currentMap[oldXCell + 1][decYCell + 4] = Cell.empty;
-								currentMap[oldXCell + 2][decYCell + 4] = Cell.empty;
-								currentMap[oldXCell + 3][decYCell + 4] = Cell.empty;
-							}
-							break;
-						}
-						case KeyEvent.VK_RIGHT: {
-							you.setOrientation(Orientation.RIGHT);
-							if (tankX + delta <= JBattleCity.HEIGHT - MapState.BLOCK_SIZE_PIXEL
-									&& getCell(incXCell + 3, oldYCell) == Cell.empty
-									&& getCell(incXCell + 3, oldYCell + 1) == Cell.empty
-									&& getCell(incXCell + 3, oldYCell + 2) == Cell.empty
-									&& getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
-								tankX += delta;
-								
-								currentMap[incXCell + 3][oldYCell] = Cell.tank;
-								currentMap[incXCell + 3][oldYCell + 1] = Cell.tank;
-								currentMap[incXCell + 3][oldYCell + 2] = Cell.tank;
-								currentMap[incXCell + 3][oldYCell + 3] = Cell.tank;
-								
-								currentMap[oldXCell][oldYCell] = Cell.empty;
-								currentMap[oldXCell][oldYCell + 1] = Cell.empty;
-								currentMap[oldXCell][oldYCell + 2] = Cell.empty;
-								currentMap[oldXCell][oldYCell + 3] = Cell.empty;
-							}
-							break;
-						}
-						case KeyEvent.VK_DOWN: {
-							you.setOrientation(Orientation.DOWN);
-							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
-									&& getCell(oldXCell, incYCell + 3) == Cell.empty
-									&& getCell(oldXCell + 1, incYCell + 3) == Cell.empty
-									&& getCell(oldXCell + 2, incYCell + 3) == Cell.empty
-									&& getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
-								tankY += delta;
-								
-								currentMap[oldXCell][incYCell + 3] = Cell.tank;
-								currentMap[oldXCell + 1][incYCell + 3] = Cell.tank;
-								currentMap[oldXCell + 2][incYCell + 3] = Cell.tank;
-								currentMap[oldXCell + 3][incYCell + 3] = Cell.tank;
-								
-								currentMap[oldXCell][oldYCell] = Cell.empty;
-								currentMap[oldXCell + 1][oldYCell] = Cell.empty;
-								currentMap[oldXCell + 2][oldYCell] = Cell.empty;
-								currentMap[oldXCell + 3][oldYCell] = Cell.empty;
-							}
-							break;
-						}
-						case KeyEvent.VK_LEFT: {
-							you.setOrientation(Orientation.LEFT);
-							if (tankX - delta >= 0
-									&& getCell(decXCell, oldYCell) == Cell.empty
-									&& getCell(decXCell, oldYCell + 1) == Cell.empty
-									&& getCell(decXCell, oldYCell + 2) == Cell.empty
-									&& getCell(decXCell, oldYCell + 3) == Cell.empty) {
-								tankX -= delta;
-								
-								currentMap[decXCell][oldYCell] = Cell.tank;
-								currentMap[decXCell][oldYCell + 1] = Cell.tank;
-								currentMap[decXCell][oldYCell + 2] = Cell.tank;
-								currentMap[decXCell][oldYCell + 3] = Cell.tank;
-								
-								currentMap[decXCell + 4][oldYCell] = Cell.empty;
-								currentMap[decXCell + 4][oldYCell + 1] = Cell.empty;
-								currentMap[decXCell + 4][oldYCell + 2] = Cell.empty;
-								currentMap[decXCell + 4][oldYCell + 3] = Cell.empty;
-							}
-							break;
-						}
-						case KeyEvent.VK_CAPS_LOCK: {
-							if (you.isHasProjectile()) break;
-							ProjectileState ps = new ProjectileState();
-							switch (you.getOrientation()) {
-								case UP: {
-									ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setY(you.getY());
-									ps.setOrientation(Orientation.UP);
-									break;
-								}
-								case RIGHT: {
-									ps.setX(you.getX() + MapState.BLOCK_SIZE_PIXEL);
-									ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setOrientation(Orientation.RIGHT);
-									break;
-								}
-								case DOWN: {
-									ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setY(you.getY() + MapState.BLOCK_SIZE_PIXEL);
-									ps.setOrientation(Orientation.DOWN);
-									break;
-								}
-								case LEFT: {
-									ps.setX(you.getX());
-									ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setOrientation(Orientation.LEFT);
-									break;
-								}
-							}
-							ps.setParent(you);
-							addProjectile(ps);
-							
-							Sound.getFire().play();
-						}
-					}
-					
-					you.setX(tankX);
-					you.setY(tankY);
-				}
-				
-				return false;
-			}
-		};
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventsDispatcher);
-		
+		yourKeyEventsDispatcher = new YourKeyEventsDispatcher(this);
 		enemiesTimer = new Timer();
-		enemiesTimer.schedule(new TimerTask() {
-			
-			Random rand = new Random();
-			
-			@Override
-			public void run() {
-				if (!isGameStarted()) return;
-				
-				if (enemies.size() < 3) {
-					addEnemy();
-				}
-
-				final int delta = 10;
-				
-				for (TankState enemy : enemies.values()) {
-					int tankX = enemy.getX();
-					int tankY = enemy.getY();
-					
-					int oldXCell = tankX / 10;
-					int incXCell = (tankX + delta) / 10;
-					int decXCell = (tankX - delta) / 10;
-					int oldYCell = tankY / 10;
-					int incYCell = (tankY + delta) / 10;
-					int decYCell = (tankY - delta) / 10;
-					
-					boolean moved = false;
-					switch (enemy.getOrientation()) {
-						case UP: {
-							if (tankY - delta >= 0
-									&& getCell(oldXCell, decYCell) == Cell.empty
-									&& getCell(oldXCell + 1, decYCell) == Cell.empty
-									&& getCell(oldXCell + 2, decYCell) == Cell.empty
-									&& getCell(oldXCell + 3, decYCell) == Cell.empty) {
-								tankY -= delta;
-								
-								synchronized (currentMap) {
-									currentMap[oldXCell][decYCell + 4] = Cell.empty;
-									currentMap[oldXCell + 1][decYCell + 4] = Cell.empty;
-									currentMap[oldXCell + 2][decYCell + 4] = Cell.empty;
-									currentMap[oldXCell + 3][decYCell + 4] = Cell.empty;
-									
-									currentMap[oldXCell][decYCell] = Cell.tank;
-									currentMap[oldXCell + 1][decYCell] = Cell.tank;
-									currentMap[oldXCell + 2][decYCell] = Cell.tank;
-									currentMap[oldXCell + 3][decYCell] = Cell.tank;
-								}
-
-								moved = true;
-							}
-							break;
-						}
-						case RIGHT: {
-							if (tankX + delta <= JBattleCity.HEIGHT - MapState.BLOCK_SIZE_PIXEL
-									&& getCell(incXCell + 3, oldYCell) == Cell.empty
-									&& getCell(incXCell + 3, oldYCell + 1) == Cell.empty
-									&& getCell(incXCell + 3, oldYCell + 2) == Cell.empty
-									&& getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
-								tankX += delta;
-
-								synchronized (currentMap) {
-									currentMap[oldXCell][oldYCell] = Cell.empty;
-									currentMap[oldXCell][oldYCell + 1] = Cell.empty;
-									currentMap[oldXCell][oldYCell + 2] = Cell.empty;
-									currentMap[oldXCell][oldYCell + 3] = Cell.empty;
-									
-									currentMap[incXCell + 3][oldYCell] = Cell.tank;
-									currentMap[incXCell + 3][oldYCell + 1] = Cell.tank;
-									currentMap[incXCell + 3][oldYCell + 2] = Cell.tank;
-									currentMap[incXCell + 3][oldYCell + 3] = Cell.tank;
-								}
-
-								moved = true;
-							}
-							break;
-						}
-						case DOWN: {
-							if (tankY + delta <= JBattleCity.WIDTH - MapState.BLOCK_SIZE_PIXEL
-									&& getCell(oldXCell, incYCell + 3) == Cell.empty
-									&& getCell(oldXCell + 1, incYCell + 3) == Cell.empty
-									&& getCell(oldXCell + 2, incYCell + 3) == Cell.empty
-									&& getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
-								tankY += delta;
-
-								synchronized (currentMap) {
-									currentMap[oldXCell][oldYCell] = Cell.empty;
-									currentMap[oldXCell + 1][oldYCell] = Cell.empty;
-									currentMap[oldXCell + 2][oldYCell] = Cell.empty;
-									currentMap[oldXCell + 3][oldYCell] = Cell.empty;
-									
-									currentMap[oldXCell][incYCell + 3] = Cell.tank;
-									currentMap[oldXCell + 1][incYCell + 3] = Cell.tank;
-									currentMap[oldXCell + 2][incYCell + 3] = Cell.tank;
-									currentMap[oldXCell + 3][incYCell + 3] = Cell.tank;
-								}
-
-								moved = true;
-							}
-							break;
-						}
-						case LEFT: {
-							if (tankX - delta >= 0
-									&& getCell(decXCell, oldYCell) == Cell.empty
-									&& getCell(decXCell, oldYCell + 1) == Cell.empty
-									&& getCell(decXCell, oldYCell + 2) == Cell.empty
-									&& getCell(decXCell, oldYCell + 3) == Cell.empty) {
-								tankX -= delta;
-
-								synchronized (currentMap) {
-									currentMap[decXCell + 4][oldYCell] = Cell.empty;
-									currentMap[decXCell + 4][oldYCell + 1] = Cell.empty;
-									currentMap[decXCell + 4][oldYCell + 2] = Cell.empty;
-									currentMap[decXCell + 4][oldYCell + 3] = Cell.empty;
-									
-									currentMap[decXCell][oldYCell] = Cell.tank;
-									currentMap[decXCell][oldYCell + 1] = Cell.tank;
-									currentMap[decXCell][oldYCell + 2] = Cell.tank;
-									currentMap[decXCell][oldYCell + 3] = Cell.tank;
-								}
-
-								moved = true;
-							}
-							break;
-						}
-					}
-					
-					if (!moved) {
-						int desision = rand.nextInt(8);
-						if (desision < 4) {
-							enemy.setOrientation(Orientation.values()[desision]);
-						} else if (!enemy.isHasProjectile()) {
-							ProjectileState ps = new ProjectileState();
-							switch (enemy.getOrientation()) {
-								case UP: {
-									ps.setX(enemy.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setY(enemy.getY());
-									ps.setOrientation(Orientation.UP);
-									break;
-								}
-								case RIGHT: {
-									ps.setX(enemy.getX() + MapState.BLOCK_SIZE_PIXEL);
-									ps.setY(enemy.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setOrientation(Orientation.RIGHT);
-									break;
-								}
-								case DOWN: {
-									ps.setX(enemy.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setY(enemy.getY() + MapState.BLOCK_SIZE_PIXEL);
-									ps.setOrientation(Orientation.DOWN);
-									break;
-								}
-								case LEFT: {
-									ps.setX(enemy.getX());
-									ps.setY(enemy.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-									ps.setOrientation(Orientation.LEFT);
-									break;
-								}
-							}
-							ps.setParent(enemy);
-							addProjectile(ps);
-						}
-					}
-					
-					enemy.setX(tankX);
-					enemy.setY(tankY);
-				}
-			}
-		}, 1000, 40);
-		
 		projectilesTimer = new Timer();
-		projectilesTimer.schedule(new TimerTask() {
-			
-			@Override
-			public void run() {
-				int delta = 5;
-				
-				Set<Integer> projectilesIds = projectiles.keySet();
-				
-				for (Integer projectileId : projectilesIds) {
-					ProjectileState ps = projectiles.get(projectileId);
-					if (ps.getX() < Images.PROJECTILE_SIZE || ps.getX() > JBattleCity.WIDTH  - Images.PROJECTILE_SIZE - delta
-					 || ps.getY() < Images.PROJECTILE_SIZE || ps.getY() > JBattleCity.HEIGHT - Images.PROJECTILE_SIZE - delta) {
-						ps.getParent().setHasProjectile(false);
-						projectiles.remove(projectileId);
-						continue;
-					}
-					
-					int x = 0, y = 0;
-					int x1 = 0, y1 = 0;
-					int x2 = 0, y2 = 0;
-					int x3 = 0, y3 = 0;
-					switch (ps.getOrientation()) {
-			    		case UP: {
-			    			int newY = ps.getY() - delta;
-			    			x = ps.getX() / 10; y = newY / 10;
-			    			x1 = x - 1; y1 = y;
-			    			x2 = x - 2; y2 = y;
-			    			x3 = x + 1; y3 = y;
-			    			ps.setY(newY);
-			    			break;
-			    		}
-			        	case RIGHT: {
-			    			int newX = ps.getX() + delta;
-			    			x = newX / 10; y = ps.getY() / 10;
-			    			x1 = x; y1 = y - 1;
-			    			x2 = x; y2 = y - 2;
-			    			x3 = x; y3 = y + 1;
-			        		ps.setX(newX);
-			        		break;
-			        	}
-			        	case DOWN: {
-			    			int newY = ps.getY() + delta;
-			    			x = ps.getX() / 10; y = newY / 10;
-			    			x1 = x - 1; y1 = y;
-			    			x2 = x - 2; y2 = y;
-			    			x3 = x + 1; y3 = y;
-			        		ps.setY(newY);
-			        		break;
-			        	}
-			        	case LEFT: {
-			    			int newX = ps.getX() - delta;
-			    			x = newX / 10; y = ps.getY() / 10;
-			    			x1 = x; y1 = y - 1;
-			    			x2 = x; y2 = y - 2;
-			    			x3 = x; y3 = y + 1;
-			        		ps.setX(newX);
-			        		break;
-			        	}
-					}
-					boolean destroyed = false;
-	    			if (getCell(x, y) != Cell.empty || getCell(x1, y1) != Cell.empty) {
-						ps.getParent().setHasProjectile(false);
-	    				projectiles.remove(projectileId);
-	    			}
-	    			if (getCell(x, y) == Cell.base || getCell(x1, y1) == Cell.base) {
-	    				setGameOver(true);
-	    			}
-	    			if (getCell(x, y) == Cell.tank || getCell(x1, y1) == Cell.base) {
-	    				destroyTank(x, y, x1, y1);
-	    			}
-	    			if (getCell(x, y) == Cell.wall) {
-	    				currentMap[x][y] = Cell.empty;
-	    				destroyed = true;
-	    			}
-	    			if (getCell(x1, y1) == Cell.wall) {
-	    				currentMap[x1][y1] = Cell.empty;
-	    				destroyed = true;
-	    			}
-	    			if (destroyed) {
-	    				if (getCell(x2, y2) == Cell.wall)
-	    					currentMap[x2][y2] = Cell.empty;
-	    				if (getCell(x3, y3) == Cell.wall)
-	    					currentMap[x3][y3] = Cell.empty;
-	    				
-	    				Sound.getBrick().play();
-	    			}
-				}
-			}
-		}, 0, 10);
 	}
 
+    @Override
 	public Cell getCell(int x, int y) {
 		return currentMap[x][y];
 	}
-	
+
+    @Override
 	public Image getMapImage() {
 		return map.getMapImage();
 	}
@@ -527,14 +121,11 @@ public class MapState implements IMap {
 	}
 	
 	public boolean isEmptyBlock(int x, int y) {
-		if (getCell(x, y)     == Cell.empty && getCell(x + 1, y)     == Cell.empty && getCell(x + 2, y)     == Cell.empty && getCell(x + 3, y)     == Cell.empty
-		 && getCell(x, y + 1) == Cell.empty && getCell(x + 1, y + 1) == Cell.empty && getCell(x + 2, y + 1) == Cell.empty && getCell(x + 3, y + 1) == Cell.empty
-		 && getCell(x, y + 2) == Cell.empty && getCell(x + 1, y + 2) == Cell.empty && getCell(x + 2, y + 2) == Cell.empty && getCell(x + 3, y + 2) == Cell.empty
-		 && getCell(x, y + 3) == Cell.empty && getCell(x + 1, y + 3) == Cell.empty && getCell(x + 2, y + 3) == Cell.empty && getCell(x + 3, y + 3) == Cell.empty) {
-			return true;
-		}
-		return false;
-	}
+        return getCell(x, y)     == Cell.empty && getCell(x + 1, y)     == Cell.empty && getCell(x + 2, y)     == Cell.empty && getCell(x + 3, y)     == Cell.empty
+            && getCell(x, y + 1) == Cell.empty && getCell(x + 1, y + 1) == Cell.empty && getCell(x + 2, y + 1) == Cell.empty && getCell(x + 3, y + 1) == Cell.empty
+            && getCell(x, y + 2) == Cell.empty && getCell(x + 1, y + 2) == Cell.empty && getCell(x + 2, y + 2) == Cell.empty && getCell(x + 3, y + 2) == Cell.empty
+            && getCell(x, y + 3) == Cell.empty && getCell(x + 1, y + 3) == Cell.empty && getCell(x + 2, y + 3) == Cell.empty && getCell(x + 3, y + 3) == Cell.empty;
+    }
 	
 	public void setTankBlock(int x, int y) {
 		synchronized (currentMap) {
@@ -580,13 +171,11 @@ public class MapState implements IMap {
 		}
 	}
 
-	public boolean isGameStarted() {
-		return gameStarted;
-	}
-
-	public void setGameStarted(boolean gameStarted) {
-		this.gameStarted = gameStarted;
-	}
+    public void startGame() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventsDispatcher);
+        enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 40);
+        projectilesTimer.schedule(new ProjectilesTimerTask(this), 0, 10);
+    }
 
 	public boolean isGameOver() {
 		return gameOver;
@@ -600,5 +189,13 @@ public class MapState implements IMap {
 		Sound.getBackground().stop();
 		Sound.getGameOver().play();
 	}
+
+    public Cell[][] getCurrentMap() {
+        return currentMap;
+    }
+
+    public Map<Integer, ProjectileState> getProjectilesMap() {
+        return projectiles;
+    }
 
 }
