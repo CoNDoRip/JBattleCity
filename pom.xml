@@ -4,9 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>JBattleCity</groupId>
-    <artifactId>JBattleCity</artifactId>
-    <version>0.1</version>
+    <groupId>ua.pp.condor.jbattlecity</groupId>
+    <artifactId>jbattlecity-single-player</artifactId>
+    <version>1.0</version>
 
+    <build>
+        <finalName>${project.artifactId}</finalName>
+    </build>
 
 </project>
