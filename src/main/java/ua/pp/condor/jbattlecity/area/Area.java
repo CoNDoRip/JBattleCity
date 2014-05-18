@@ -5,12 +5,17 @@ import java.awt.Graphics;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Socket;
 import java.util.TimerTask;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import ua.pp.condor.jbattlecity.area.maps.IMap;
+import ua.pp.condor.jbattlecity.network.Protocol;
 import ua.pp.condor.jbattlecity.tank.EnemyTankState;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.YouTankState;
@@ -20,12 +25,18 @@ import ua.pp.condor.jbattlecity.utils.Sound;
 public class Area extends JPanel {
 
     private static final long serialVersionUID = -2993932675117489481L;
+
+    private InputStream in;
+    private BufferedOutputStream out;
     
     private final MapState mapState;
     
     private int currentBang;
     
-    public Area(IMap map) {
+    public Area(Socket socket, IMap map) throws IOException {
+        in = socket.getInputStream();
+        out = new BufferedOutputStream(socket.getOutputStream());
+
         mapState = new MapState(map);
         
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
@@ -60,24 +71,26 @@ public class Area extends JPanel {
         mt.addImage(Images.getGameOver(), 9);
         try {
             mt.waitForAll();
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        }
+        } catch (InterruptedException e) {}
         if (mt.isErrorAny())
             throw new IllegalStateException("Errors in images loading");
-        
-        Sound.getGameStart().play();
-        new java.util.Timer().schedule(new TimerTask() {
-            
-            @Override
-            public void run() {
-                repaintTimer.start();
-                mapState.startGame();
-                Sound.getBackground().loop();
-            }
-        }, 4000);
-        
+
         currentBang = 0;
+
+        int code = in.read();
+        if (code == Protocol.START_GAME) {
+            Sound.getGameStart().play();
+            new java.util.Timer().schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    repaintTimer.start();
+                    mapState.startGame();
+                    Sound.getBackground().loop();
+                }
+            }, 4000);
+        } else
+            throw new IOException("Incorrect code from server");
     }
 
     @Override
