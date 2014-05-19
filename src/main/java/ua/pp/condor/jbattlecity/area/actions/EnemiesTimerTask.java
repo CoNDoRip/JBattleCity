@@ -13,11 +13,9 @@ import java.util.TimerTask;
 public class EnemiesTimerTask extends TimerTask {
 
     private final MapState mapState;
-    private final Cell[][] currentMap;
 
     public EnemiesTimerTask(MapState mapState) {
         this.mapState = mapState;
-        currentMap = mapState.getCurrentMap();
     }
 
     Random rand = new Random();
@@ -52,18 +50,7 @@ public class EnemiesTimerTask extends TimerTask {
                             && mapState.getCell(oldXCell + 3, decYCell) == Cell.empty) {
                         tankY -= delta;
 
-                        synchronized (currentMap) {
-                            currentMap[oldXCell][decYCell + 4] = Cell.empty;
-                            currentMap[oldXCell + 1][decYCell + 4] = Cell.empty;
-                            currentMap[oldXCell + 2][decYCell + 4] = Cell.empty;
-                            currentMap[oldXCell + 3][decYCell + 4] = Cell.empty;
-
-                            currentMap[oldXCell][decYCell] = Cell.tank;
-                            currentMap[oldXCell + 1][decYCell] = Cell.tank;
-                            currentMap[oldXCell + 2][decYCell] = Cell.tank;
-                            currentMap[oldXCell + 3][decYCell] = Cell.tank;
-                        }
-
+                        mapState.moveTankBlock(tankX, tankY, Orientation.UP);
                         moved = true;
                     }
                     break;
@@ -76,18 +63,7 @@ public class EnemiesTimerTask extends TimerTask {
                             && mapState.getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
                         tankX += delta;
 
-                        synchronized (currentMap) {
-                            currentMap[oldXCell][oldYCell] = Cell.empty;
-                            currentMap[oldXCell][oldYCell + 1] = Cell.empty;
-                            currentMap[oldXCell][oldYCell + 2] = Cell.empty;
-                            currentMap[oldXCell][oldYCell + 3] = Cell.empty;
-
-                            currentMap[incXCell + 3][oldYCell] = Cell.tank;
-                            currentMap[incXCell + 3][oldYCell + 1] = Cell.tank;
-                            currentMap[incXCell + 3][oldYCell + 2] = Cell.tank;
-                            currentMap[incXCell + 3][oldYCell + 3] = Cell.tank;
-                        }
-
+                        mapState.moveTankBlock(tankX, tankY, Orientation.RIGHT);
                         moved = true;
                     }
                     break;
@@ -100,18 +76,7 @@ public class EnemiesTimerTask extends TimerTask {
                             && mapState.getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
                         tankY += delta;
 
-                        synchronized (currentMap) {
-                            currentMap[oldXCell][oldYCell] = Cell.empty;
-                            currentMap[oldXCell + 1][oldYCell] = Cell.empty;
-                            currentMap[oldXCell + 2][oldYCell] = Cell.empty;
-                            currentMap[oldXCell + 3][oldYCell] = Cell.empty;
-
-                            currentMap[oldXCell][incYCell + 3] = Cell.tank;
-                            currentMap[oldXCell + 1][incYCell + 3] = Cell.tank;
-                            currentMap[oldXCell + 2][incYCell + 3] = Cell.tank;
-                            currentMap[oldXCell + 3][incYCell + 3] = Cell.tank;
-                        }
-
+                        mapState.moveTankBlock(tankX, tankY, Orientation.DOWN);
                         moved = true;
                     }
                     break;
@@ -124,18 +89,7 @@ public class EnemiesTimerTask extends TimerTask {
                             && mapState.getCell(decXCell, oldYCell + 3) == Cell.empty) {
                         tankX -= delta;
 
-                        synchronized (currentMap) {
-                            currentMap[decXCell + 4][oldYCell] = Cell.empty;
-                            currentMap[decXCell + 4][oldYCell + 1] = Cell.empty;
-                            currentMap[decXCell + 4][oldYCell + 2] = Cell.empty;
-                            currentMap[decXCell + 4][oldYCell + 3] = Cell.empty;
-
-                            currentMap[decXCell][oldYCell] = Cell.tank;
-                            currentMap[decXCell][oldYCell + 1] = Cell.tank;
-                            currentMap[decXCell][oldYCell + 2] = Cell.tank;
-                            currentMap[decXCell][oldYCell + 3] = Cell.tank;
-                        }
-
+                        mapState.moveTankBlock(tankX, tankY, Orientation.LEFT);
                         moved = true;
                     }
                     break;
