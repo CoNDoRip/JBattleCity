@@ -14,6 +14,7 @@ import ua.pp.condor.jbattlecity.utils.Sound;
 import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +51,8 @@ public class MapState implements IMap {
     private final Timer projectilesTimer;
     
     private boolean gameOver;
+
+    private OutputStream out;
     
     public MapState(IMap map) {
         this.map = map;
@@ -68,6 +71,11 @@ public class MapState implements IMap {
         yourKeyEventsDispatcher = new YourKeyEventsDispatcher(this);
         enemiesTimer = new Timer();
         projectilesTimer = new Timer();
+    }
+
+    public MapState(IMap map, OutputStream out) {
+        this(map);
+        this.out = out;
     }
 
     @Override
@@ -196,6 +204,10 @@ public class MapState implements IMap {
 
     public Map<Integer, ProjectileState> getProjectilesMap() {
         return projectiles;
+    }
+
+    public OutputStream getOut() {
+        return out;
     }
 
 }

@@ -5,9 +5,9 @@ import java.awt.Graphics;
 import java.awt.MediaTracker;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.TimerTask;
 
@@ -27,7 +27,7 @@ public class Area extends JPanel {
     private static final long serialVersionUID = -2993932675117489481L;
 
     private InputStream in;
-    private BufferedOutputStream out;
+    private OutputStream out;
     
     private final MapState mapState;
     
@@ -35,9 +35,9 @@ public class Area extends JPanel {
     
     public Area(Socket socket, IMap map) throws IOException {
         in = socket.getInputStream();
-        out = new BufferedOutputStream(socket.getOutputStream());
+        out = socket.getOutputStream();
 
-        mapState = new MapState(map);
+        mapState = new MapState(map, out);
         
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         
