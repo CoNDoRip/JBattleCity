@@ -2,6 +2,7 @@ package ua.pp.condor.jbattlecity;
 
 import org.apache.log4j.Logger;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,11 +15,11 @@ public class GameJob extends Thread {
     private final Socket firstPlayer;
     private final Socket secondPlayer;
 
-    private InputStream fIn;
+    private BufferedInputStream fIn;
     private OutputStream fOut;
     private InputReader fReader;
 
-    private InputStream sIn;
+    private BufferedInputStream sIn;
     private OutputStream sOut;
     private InputReader sReader;
 
@@ -27,11 +28,11 @@ public class GameJob extends Thread {
         this.secondPlayer = secondPlayer;
 
         try {
-            fIn = firstPlayer.getInputStream();
+            fIn = new BufferedInputStream(firstPlayer.getInputStream());
             fOut = firstPlayer.getOutputStream();
             fReader = new InputReader(fIn, 1);
 
-            sIn = secondPlayer.getInputStream();
+            sIn = new BufferedInputStream(secondPlayer.getInputStream());
             sOut = secondPlayer.getOutputStream();
             sReader = new InputReader(sIn, 2);
         } catch (IOException e) {

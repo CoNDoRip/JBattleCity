@@ -2,6 +2,7 @@ package ua.pp.condor.jbattlecity;
 
 import org.apache.log4j.Logger;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -9,10 +10,10 @@ public class InputReader extends Thread {
 
     private static final Logger logger = Logger.getLogger(InputReader.class);
 
-    private final InputStream in;
+    private final BufferedInputStream in;
     private final int playerId;
 
-    public InputReader(InputStream in, int playerId) {
+    public InputReader(BufferedInputStream in, int playerId) {
         this.in = in;
         this.playerId = playerId;
     }
