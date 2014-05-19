@@ -18,23 +18,25 @@ import java.io.OutputStream;
 public class YourKeyEventsDispatcher implements KeyEventDispatcher {
 
     private final MapState mapState;
-    private final Cell[][] currentMap;
 
     private final byte[] orientationBuf;
     private final byte[] movingBuf;
+    private final byte[] shootingBuf;
 
     private boolean changeOrientation;
     private boolean changePlace;
+    private boolean doneShooting;
 
     public YourKeyEventsDispatcher(MapState mapState) {
         this.mapState = mapState;
-        currentMap = mapState.getCurrentMap();
 
         orientationBuf = new byte[3];
         orientationBuf[1] = Protocol.ORIENTATION;
         movingBuf = new byte[3];
         movingBuf[1] = Protocol.MOVING;
-        orientationBuf[0] = movingBuf[0] = Protocol.FRIEND;
+        shootingBuf = new byte[3];
+        shootingBuf[1] = Protocol.SHOOTING;
+        orientationBuf[0] = movingBuf[0] = shootingBuf[0] = Protocol.FRIEND;
     }
 
     @Override
@@ -54,8 +56,7 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
             int incYCell = (tankY + delta) / 10;
             int decYCell = (tankY - delta) / 10;
 
-            changeOrientation = false;
-            changePlace = false;
+            changeOrientation = changePlace = doneShooting = false;
 
             switch (arg0.getKeyCode()) {
                 case KeyEvent.VK_UP: {
@@ -116,35 +117,8 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
                 }
                 case KeyEvent.VK_CAPS_LOCK: {
                     if (you.isHasProjectile()) break;
-                    ProjectileState ps = new ProjectileState();
-                    switch (you.getOrientation()) {
-                        case UP: {
-                            ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-                            ps.setY(you.getY());
-                            ps.setOrientation(Orientation.UP);
-                            break;
-                        }
-                        case RIGHT: {
-                            ps.setX(you.getX() + MapState.BLOCK_SIZE_PIXEL);
-                            ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-                            ps.setOrientation(Orientation.RIGHT);
-                            break;
-                        }
-                        case DOWN: {
-                            ps.setX(you.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-                            ps.setY(you.getY() + MapState.BLOCK_SIZE_PIXEL);
-                            ps.setOrientation(Orientation.DOWN);
-                            break;
-                        }
-                        case LEFT: {
-                            ps.setX(you.getX());
-                            ps.setY(you.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-                            ps.setOrientation(Orientation.LEFT);
-                            break;
-                        }
-                    }
-                    ps.setParent(you);
-                    mapState.addProjectile(ps);
+                    mapState.addProjectile(you);
+                    doShooting(you.getOrientation());
 
                     Sound.getFire().play();
                 }
@@ -159,6 +133,8 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
                     out.write(orientationBuf);
                 if (changePlace)
                     out.write(movingBuf);
+                if (doneShooting)
+                    out.write(shootingBuf);
             } catch (IOException e) {
                 System.out.println("Can not send info to server in YourKeyEventDispatcher: " + e.getMessage());
             }
@@ -178,6 +154,11 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
     private void doMoving(Orientation orientation) {
         movingBuf[2] = (byte) orientation.ordinal();
         changePlace = true;
+    }
+
+    private void doShooting(Orientation orientation) {
+        shootingBuf[2] = (byte) orientation.ordinal();
+        doneShooting = true;
     }
 
 }

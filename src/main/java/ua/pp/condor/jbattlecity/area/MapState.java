@@ -100,8 +100,33 @@ public class MapState implements IMap {
         return projectiles.values();
     }
     
-    public void addProjectile(ProjectileState projectile) {
-        projectiles.put(projectileId++, projectile);
+    public void addProjectile(TankState tank) {
+        ProjectileState ps = new ProjectileState();
+        ps.setOrientation(tank.getOrientation());
+        switch (ps.getOrientation()) {
+            case UP: {
+                ps.setX(tank.getX() + HALF_BLOCK_SIZE_PIXEL);
+                ps.setY(tank.getY());
+                break;
+            }
+            case RIGHT: {
+                ps.setX(tank.getX() + BLOCK_SIZE_PIXEL);
+                ps.setY(tank.getY() + HALF_BLOCK_SIZE_PIXEL);
+                break;
+            }
+            case DOWN: {
+                ps.setX(tank.getX() + HALF_BLOCK_SIZE_PIXEL);
+                ps.setY(tank.getY() + BLOCK_SIZE_PIXEL);
+                break;
+            }
+            case LEFT: {
+                ps.setX(tank.getX());
+                ps.setY(tank.getY() + HALF_BLOCK_SIZE_PIXEL);
+                break;
+            }
+        }
+        ps.setParent(tank);
+        projectiles.put(projectileId++, ps);
     }
 
     public Collection<TankState> getEnemies() {

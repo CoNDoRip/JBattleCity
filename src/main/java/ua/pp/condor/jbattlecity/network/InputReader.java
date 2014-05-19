@@ -25,40 +25,44 @@ public class InputReader extends Thread {
         try {
             while ((count = in.read(buf, 0, 3)) >= 0) {
                 //TODO
+                TankState tank = null;
                 if (buf[0] == Protocol.FRIEND) {
-                    TankState friend = mapState.getFriend();
+                    tank = mapState.getFriend();
+                }
+                if (tank != null) {
                     Orientation orientation = Orientation.values()[buf[2]];
                     switch (buf[1]) {
                         case Protocol.ORIENTATION: {
-                            friend.setOrientation(orientation);
+                            tank.setOrientation(orientation);
                             break;
                         }
                         case Protocol.MOVING: {
                             switch (orientation) {
                                 case UP:    {
-                                    friend.setY(friend.getY() - Constants.TANK_STEP);
-                                    mapState.moveTankBlock(friend.getX(), friend.getY(), Orientation.UP);
+                                    tank.setY(tank.getY() - Constants.TANK_STEP);
+                                    mapState.moveTankBlock(tank.getX(), tank.getY(), Orientation.UP);
                                     break;
                                 }
                                 case RIGHT: {
-                                    friend.setX(friend.getX() + Constants.TANK_STEP);
-                                    mapState.moveTankBlock(friend.getX(), friend.getY(), Orientation.RIGHT);
+                                    tank.setX(tank.getX() + Constants.TANK_STEP);
+                                    mapState.moveTankBlock(tank.getX(), tank.getY(), Orientation.RIGHT);
                                     break;
                                 }
                                 case DOWN:  {
-                                    friend.setY(friend.getY() + Constants.TANK_STEP);
-                                    mapState.moveTankBlock(friend.getX(), friend.getY(), Orientation.DOWN);
+                                    tank.setY(tank.getY() + Constants.TANK_STEP);
+                                    mapState.moveTankBlock(tank.getX(), tank.getY(), Orientation.DOWN);
                                     break;
                                 }
                                 case LEFT:  {
-                                    friend.setX(friend.getX() - Constants.TANK_STEP);
-                                    mapState.moveTankBlock(friend.getX(), friend.getY(), Orientation.LEFT);
+                                    tank.setX(tank.getX() - Constants.TANK_STEP);
+                                    mapState.moveTankBlock(tank.getX(), tank.getY(), Orientation.LEFT);
                                     break;
                                 }
                             }
                             break;
                         }
                         case Protocol.SHOOTING: {
+                            mapState.addProjectile(tank);
                             break;
                         }
                         default: {

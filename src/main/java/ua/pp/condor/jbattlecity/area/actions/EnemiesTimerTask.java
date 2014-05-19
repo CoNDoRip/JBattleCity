@@ -4,7 +4,6 @@ import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.Cell;
 import ua.pp.condor.jbattlecity.area.MapState;
 import ua.pp.condor.jbattlecity.tank.Orientation;
-import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
 
 import java.util.Collection;
@@ -148,35 +147,7 @@ public class EnemiesTimerTask extends TimerTask {
                 if (desision < 4) {
                     enemy.setOrientation(Orientation.values()[desision]);
                 } else if (!enemy.isHasProjectile()) {
-                    ProjectileState ps = new ProjectileState();
-                    switch (enemy.getOrientation()) {
-                        case UP: {
-                            ps.setX(enemy.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-                            ps.setY(enemy.getY());
-                            ps.setOrientation(Orientation.UP);
-                            break;
-                        }
-                        case RIGHT: {
-                            ps.setX(enemy.getX() + MapState.BLOCK_SIZE_PIXEL);
-                            ps.setY(enemy.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-                            ps.setOrientation(Orientation.RIGHT);
-                            break;
-                        }
-                        case DOWN: {
-                            ps.setX(enemy.getX() + MapState.HALF_BLOCK_SIZE_PIXEL);
-                            ps.setY(enemy.getY() + MapState.BLOCK_SIZE_PIXEL);
-                            ps.setOrientation(Orientation.DOWN);
-                            break;
-                        }
-                        case LEFT: {
-                            ps.setX(enemy.getX());
-                            ps.setY(enemy.getY() + MapState.HALF_BLOCK_SIZE_PIXEL);
-                            ps.setOrientation(Orientation.LEFT);
-                            break;
-                        }
-                    }
-                    ps.setParent(enemy);
-                    mapState.addProjectile(ps);
+                    mapState.addProjectile(enemy);
                 }
             }
 
