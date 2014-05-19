@@ -30,11 +30,12 @@ public class GameJob extends Thread {
         try {
             fIn = new BufferedInputStream(firstPlayer.getInputStream());
             fOut = firstPlayer.getOutputStream();
-            fReader = new InputReader(fIn, 1);
 
             sIn = new BufferedInputStream(secondPlayer.getInputStream());
             sOut = secondPlayer.getOutputStream();
-            sReader = new InputReader(sIn, 2);
+
+            fReader = new InputReader(1, fIn, sOut);
+            sReader = new InputReader(2, sIn, fOut);
         } catch (IOException e) {
             logger.error("Can not get input of output stream of one of players", e);
             interrupt();
