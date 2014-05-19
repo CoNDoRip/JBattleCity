@@ -45,19 +45,19 @@ public class GameJob extends Thread {
         logger.debug("started with id = " + getId());
         //TODO Auto-generated method stub
         try {
-            sendToBoth(Protocol.START_GAME);
+            //Send START_GAME code with playerId to both players
+            byte[] buf = new byte[2];
+            buf[0] = Protocol.START_GAME;
+            buf[1] = 1;
+            fOut.write(buf);
+            buf[1] = 2;
+            sOut.write(buf);
+
             fReader.start();
             sReader.start();
         } catch (IOException e) {
             logger.error("Problems with socket", e);
         }
-    }
-
-    private void sendToBoth(byte code) throws IOException {
-        fOut.write(code);
-        fOut.flush();
-        sOut.write(code);
-        sOut.flush();
     }
 
     @Override
