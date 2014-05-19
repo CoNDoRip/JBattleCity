@@ -4,6 +4,7 @@ import ua.pp.condor.jbattlecity.area.actions.EnemiesTimerTask;
 import ua.pp.condor.jbattlecity.area.actions.ProjectilesTimerTask;
 import ua.pp.condor.jbattlecity.area.actions.YourKeyEventsDispatcher;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
+import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.tank.TanksFactory;
@@ -154,6 +155,63 @@ public class MapState implements IMap {
         }
     }
     
+    public void moveTankBlock(int x, int y, Orientation orientation) {
+        x /= 10;
+        y /= 10;
+        synchronized (currentMap) {
+            switch (orientation) {
+                case UP: {
+                    currentMap[x]    [y] = Cell.tank;
+                    currentMap[x + 1][y] = Cell.tank;
+                    currentMap[x + 2][y] = Cell.tank;
+                    currentMap[x + 3][y] = Cell.tank;
+
+                    currentMap[x]    [y + 4] = Cell.empty;
+                    currentMap[x + 1][y + 4] = Cell.empty;
+                    currentMap[x + 2][y + 4] = Cell.empty;
+                    currentMap[x + 3][y + 4] = Cell.empty;
+                    break;
+                }
+                case RIGHT: {
+                    currentMap[x + 3][y]     = Cell.tank;
+                    currentMap[x + 3][y + 1] = Cell.tank;
+                    currentMap[x + 3][y + 2] = Cell.tank;
+                    currentMap[x + 3][y + 3] = Cell.tank;
+
+                    currentMap[x - 1][y]     = Cell.empty;
+                    currentMap[x - 1][y + 1] = Cell.empty;
+                    currentMap[x - 1][y + 2] = Cell.empty;
+                    currentMap[x - 1][y + 3] = Cell.empty;
+                    break;
+                }
+                case DOWN: {
+                    currentMap[x]    [y + 3] = Cell.tank;
+                    currentMap[x + 1][y + 3] = Cell.tank;
+                    currentMap[x + 2][y + 3] = Cell.tank;
+                    currentMap[x + 3][y + 3] = Cell.tank;
+
+                    currentMap[x]    [y - 1] = Cell.empty;
+                    currentMap[x + 1][y - 1] = Cell.empty;
+                    currentMap[x + 2][y - 1] = Cell.empty;
+                    currentMap[x + 3][y - 1] = Cell.empty;
+                    break;
+                }
+                case LEFT: {
+                    currentMap[x][y]     = Cell.tank;
+                    currentMap[x][y + 1] = Cell.tank;
+                    currentMap[x][y + 2] = Cell.tank;
+                    currentMap[x][y + 3] = Cell.tank;
+
+                    currentMap[x + 4][y]     = Cell.empty;
+                    currentMap[x + 4][y + 1] = Cell.empty;
+                    currentMap[x + 4][y + 2] = Cell.empty;
+                    currentMap[x + 4][y + 3] = Cell.empty;
+                    break;
+                }
+            }
+        }
+    }
+    
     public void destroyTank(int x, int y, int x1, int y1) {
         Set<Integer> enemiesIds = enemies.keySet();
         for (Integer enemyId : enemiesIds) {
@@ -183,7 +241,7 @@ public class MapState implements IMap {
         friend = TanksFactory.getFriend(id == 1 ? PlayerPosition.SECOND : PlayerPosition.FIRST, this);
 
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventsDispatcher);
-        enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 40);
+//        enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 40);  FIXME
         projectilesTimer.schedule(new ProjectilesTimerTask(this), 0, 10);
     }
 

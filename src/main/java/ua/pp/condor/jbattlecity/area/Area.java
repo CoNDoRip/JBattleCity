@@ -1,37 +1,37 @@
 package ua.pp.condor.jbattlecity.area;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.MediaTracker;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.TimerTask;
-
-import javax.swing.JPanel;
-import javax.swing.Timer;
-
 import ua.pp.condor.jbattlecity.area.maps.IMap;
+import ua.pp.condor.jbattlecity.network.InputReader;
 import ua.pp.condor.jbattlecity.network.Protocol;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.utils.Images;
 import ua.pp.condor.jbattlecity.utils.Sound;
 
+import javax.swing.JPanel;
+import javax.swing.Timer;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.MediaTracker;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.TimerTask;
+
 public class Area extends JPanel {
 
     private static final long serialVersionUID = -2993932675117489481L;
 
-    private InputStream in;
+    private BufferedInputStream in;
     private OutputStream out;
     
     private final MapState mapState;
     
     public Area(Socket socket, IMap map) throws IOException {
-        in = socket.getInputStream();
+        in = new BufferedInputStream(socket.getInputStream());
         out = socket.getOutputStream();
 
         mapState = new MapState(map, out);
@@ -76,6 +76,7 @@ public class Area extends JPanel {
         int count = in.read(buf);
         if (count == 2 && buf[0] == Protocol.START_GAME) {
             Sound.getGameStart().play();
+            new InputReader(in, mapState).start();
             new java.util.Timer().schedule(new TimerTask() {
 
                 @Override

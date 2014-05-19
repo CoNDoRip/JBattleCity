@@ -2,6 +2,7 @@ package ua.pp.condor.jbattlecity.area.actions;
 
 import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.Cell;
+import ua.pp.condor.jbattlecity.area.Constants;
 import ua.pp.condor.jbattlecity.area.MapState;
 import ua.pp.condor.jbattlecity.network.Protocol;
 import ua.pp.condor.jbattlecity.tank.Orientation;
@@ -39,7 +40,7 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
     @Override
     public boolean dispatchKeyEvent(KeyEvent arg0) {
         if (arg0.getID() == KeyEvent.KEY_PRESSED) {
-            final int delta = 10;
+            final int delta = Constants.TANK_STEP;
 
             TankState you = mapState.getYou();
 
@@ -67,16 +68,7 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
                             && mapState.getCell(oldXCell + 3, decYCell) == Cell.empty) {
                         tankY -= delta;
                         doMoving(Orientation.UP);
-
-                        currentMap[oldXCell][decYCell] = Cell.tank;
-                        currentMap[oldXCell + 1][decYCell] = Cell.tank;
-                        currentMap[oldXCell + 2][decYCell] = Cell.tank;
-                        currentMap[oldXCell + 3][decYCell] = Cell.tank;
-
-                        currentMap[oldXCell][decYCell + 4] = Cell.empty;
-                        currentMap[oldXCell + 1][decYCell + 4] = Cell.empty;
-                        currentMap[oldXCell + 2][decYCell + 4] = Cell.empty;
-                        currentMap[oldXCell + 3][decYCell + 4] = Cell.empty;
+                        mapState.moveTankBlock(tankX, tankY, Orientation.UP);
                     }
                     break;
                 }
@@ -90,16 +82,7 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
                             && mapState.getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
                         tankX += delta;
                         doMoving(Orientation.RIGHT);
-
-                        currentMap[incXCell + 3][oldYCell] = Cell.tank;
-                        currentMap[incXCell + 3][oldYCell + 1] = Cell.tank;
-                        currentMap[incXCell + 3][oldYCell + 2] = Cell.tank;
-                        currentMap[incXCell + 3][oldYCell + 3] = Cell.tank;
-
-                        currentMap[oldXCell][oldYCell] = Cell.empty;
-                        currentMap[oldXCell][oldYCell + 1] = Cell.empty;
-                        currentMap[oldXCell][oldYCell + 2] = Cell.empty;
-                        currentMap[oldXCell][oldYCell + 3] = Cell.empty;
+                        mapState.moveTankBlock(tankX, tankY, Orientation.RIGHT);
                     }
                     break;
                 }
@@ -113,16 +96,7 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
                             && mapState.getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
                         tankY += delta;
                         doMoving(Orientation.DOWN);
-
-                        currentMap[oldXCell][incYCell + 3] = Cell.tank;
-                        currentMap[oldXCell + 1][incYCell + 3] = Cell.tank;
-                        currentMap[oldXCell + 2][incYCell + 3] = Cell.tank;
-                        currentMap[oldXCell + 3][incYCell + 3] = Cell.tank;
-
-                        currentMap[oldXCell][oldYCell] = Cell.empty;
-                        currentMap[oldXCell + 1][oldYCell] = Cell.empty;
-                        currentMap[oldXCell + 2][oldYCell] = Cell.empty;
-                        currentMap[oldXCell + 3][oldYCell] = Cell.empty;
+                        mapState.moveTankBlock(tankX, tankY, Orientation.DOWN);
                     }
                     break;
                 }
@@ -136,16 +110,7 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
                             && mapState.getCell(decXCell, oldYCell + 3) == Cell.empty) {
                         tankX -= delta;
                         doMoving(Orientation.LEFT);
-
-                        currentMap[decXCell][oldYCell] = Cell.tank;
-                        currentMap[decXCell][oldYCell + 1] = Cell.tank;
-                        currentMap[decXCell][oldYCell + 2] = Cell.tank;
-                        currentMap[decXCell][oldYCell + 3] = Cell.tank;
-
-                        currentMap[decXCell + 4][oldYCell] = Cell.empty;
-                        currentMap[decXCell + 4][oldYCell + 1] = Cell.empty;
-                        currentMap[decXCell + 4][oldYCell + 2] = Cell.empty;
-                        currentMap[decXCell + 4][oldYCell + 3] = Cell.empty;
+                        mapState.moveTankBlock(tankX, tankY, Orientation.LEFT);
                     }
                     break;
                 }
