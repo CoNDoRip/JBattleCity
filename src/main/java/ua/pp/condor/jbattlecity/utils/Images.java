@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.TankColor;
+import ua.pp.condor.jbattlecity.tank.TankState;
 
 public final class Images {
     
@@ -184,7 +185,9 @@ public final class Images {
         return gameOver;
     }
     
-    public static Image getTankImage(Orientation orientation, TankColor color) {
+    public static Image getTankImage(TankState tank) {
+        final Orientation orientation = tank.getOrientation();
+        final TankColor color = tank.getTankColor();
         switch (orientation) {
             case UP: {
                 switch (color) {

@@ -16,9 +16,8 @@ import javax.swing.Timer;
 
 import ua.pp.condor.jbattlecity.area.maps.IMap;
 import ua.pp.condor.jbattlecity.network.Protocol;
-import ua.pp.condor.jbattlecity.tank.EnemyTankState;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
-import ua.pp.condor.jbattlecity.tank.YouTankState;
+import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.utils.Images;
 import ua.pp.condor.jbattlecity.utils.Sound;
 
@@ -30,8 +29,6 @@ public class Area extends JPanel {
     private OutputStream out;
     
     private final MapState mapState;
-    
-    private int currentBang;
     
     public Area(Socket socket, IMap map) throws IOException {
         in = socket.getInputStream();
@@ -75,17 +72,16 @@ public class Area extends JPanel {
         if (mt.isErrorAny())
             throw new IllegalStateException("Errors in images loading");
 
-        currentBang = 0;
-
-        int code = in.read();
-        if (code == Protocol.START_GAME) {
+        final byte[] buf = new byte[2];
+        int count = in.read(buf);
+        if (count == 2 && buf[0] == Protocol.START_GAME) {
             Sound.getGameStart().play();
             new java.util.Timer().schedule(new TimerTask() {
 
                 @Override
                 public void run() {
                     repaintTimer.start();
-                    mapState.startGame();
+                    mapState.startGame(buf[1]);
                     Sound.getBackground().loop();
                 }
             }, 4000);
@@ -107,17 +103,18 @@ public class Area extends JPanel {
             }
         }
         
-        YouTankState you = mapState.getYou();
-        if (you.getOrientation() != null) {
-            g.drawImage(Images.getTankImage(you.getOrientation(), you.getTankColor()), you.getX(), you.getY(), this);
-        } else {
-            g.drawImage(Images.getBang(currentBang), you.getX(), you.getY(), this);
-            if (currentBang < 4) currentBang++;
-            else currentBang = 0;
+        TankState you = mapState.getYou();
+        if (you != null) {
+            g.drawImage(Images.getTankImage(you), you.getX(), you.getY(), this);
+        }
+
+        TankState friend = mapState.getFriend();
+        if (friend != null) {
+            g.drawImage(Images.getTankImage(friend), friend.getX(), friend.getY(), this);
         }
         
-        for (EnemyTankState enemy : mapState.getEnemies()) {
-            g.drawImage(Images.getTankImage(enemy.getOrientation(), enemy.getTankColor()), enemy.getX(), enemy.getY(), this);
+        for (TankState enemy : mapState.getEnemies()) {
+            g.drawImage(Images.getTankImage(enemy), enemy.getX(), enemy.getY(), this);
         }
         
         for (ProjectileState ps : mapState.getProjectiles()) {

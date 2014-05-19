@@ -4,11 +4,11 @@ import ua.pp.condor.jbattlecity.area.actions.EnemiesTimerTask;
 import ua.pp.condor.jbattlecity.area.actions.ProjectilesTimerTask;
 import ua.pp.condor.jbattlecity.area.actions.YourKeyEventsDispatcher;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
-import ua.pp.condor.jbattlecity.tank.EnemyTankState;
-import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
-import ua.pp.condor.jbattlecity.tank.YouTankState;
+import ua.pp.condor.jbattlecity.tank.TanksFactory;
+import ua.pp.condor.jbattlecity.tank.TanksFactory.EnemyPosition;
+import ua.pp.condor.jbattlecity.tank.TanksFactory.PlayerPosition;
 import ua.pp.condor.jbattlecity.utils.Sound;
 
 import java.awt.Image;
@@ -34,11 +34,12 @@ public class MapState implements IMap {
     
     private final IMap map;
     
-    private YouTankState you;
+    private TankState you;
+    private TankState friend;
     
     private final KeyEventDispatcher yourKeyEventsDispatcher;
     
-    private final Map<Integer, EnemyTankState> enemies;
+    private final Map<Integer, TankState> enemies;
     
     private int enemyId;
     
@@ -61,9 +62,7 @@ public class MapState implements IMap {
                 currentMap[x][y] = map.getCell(x, y);
             }
         }
-        you = new YouTankState(160, 480, Orientation.UP);
-        setTankBlock(16, 48);
-        enemies = new ConcurrentHashMap<Integer, EnemyTankState>();
+        enemies = new ConcurrentHashMap<Integer, TankState>();
         projectiles = new ConcurrentHashMap<Integer, ProjectileState>();
         enemyId = 0;
         projectileId = 0;
@@ -88,12 +87,12 @@ public class MapState implements IMap {
         return map.getMapImage();
     }
 
-    public YouTankState getYou() {
+    public TankState getYou() {
         return you;
     }
 
-    public void setYou(YouTankState you) {
-        this.you = you;
+    public TankState getFriend() {
+        return friend;
     }
 
     public Collection<ProjectileState> getProjectiles() {
@@ -104,31 +103,30 @@ public class MapState implements IMap {
         projectiles.put(projectileId++, projectile);
     }
 
-    public Collection<EnemyTankState> getEnemies() {
+    public Collection<TankState> getEnemies() {
         return enemies.values();
     }
     
     public boolean addEnemy() {
-        if (isEmptyBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0)) {
-            EnemyTankState enemy = new EnemyTankState(BLOCKS_COUNT / 2 * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
+        if (isEmptyBlock(EnemyPosition.SECOND.getX(), EnemyPosition.SECOND.getY())) {
+            TankState enemy = TanksFactory.getEnemy(EnemyPosition.SECOND, this);
             enemies.put(enemyId++, enemy);
-            setTankBlock(BLOCKS_COUNT / 2 * BLOCK_SIZE, 0);
             return true;
-        } else if (isEmptyBlock(0, 0)) {
-            EnemyTankState enemy = new EnemyTankState(0, 0, Orientation.DOWN);
+        } else if (isEmptyBlock(EnemyPosition.FIRST.getX(), EnemyPosition.FIRST.getY())) {
+            TankState enemy = TanksFactory.getEnemy(EnemyPosition.FIRST, this);
             enemies.put(enemyId++, enemy);
-            setTankBlock(0, 0);
             return true;
-        } else if (isEmptyBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0)) {
-            EnemyTankState enemy = new EnemyTankState((BLOCKS_COUNT - 1) * BLOCK_SIZE_PIXEL, 0, Orientation.DOWN);
+        } else if (isEmptyBlock(EnemyPosition.THIRD.getX(), EnemyPosition.THIRD.getY())) {
+            TankState enemy = TanksFactory.getEnemy(EnemyPosition.THIRD, this);
             enemies.put(enemyId++, enemy);
-            setTankBlock((BLOCKS_COUNT - 1) * BLOCK_SIZE, 0);
             return true;
         }
         return false;
     }
     
     public boolean isEmptyBlock(int x, int y) {
+        x /= 10;
+        y /= 10;
         return getCell(x, y)     == Cell.empty && getCell(x + 1, y)     == Cell.empty && getCell(x + 2, y)     == Cell.empty && getCell(x + 3, y)     == Cell.empty
             && getCell(x, y + 1) == Cell.empty && getCell(x + 1, y + 1) == Cell.empty && getCell(x + 2, y + 1) == Cell.empty && getCell(x + 3, y + 1) == Cell.empty
             && getCell(x, y + 2) == Cell.empty && getCell(x + 1, y + 2) == Cell.empty && getCell(x + 2, y + 2) == Cell.empty && getCell(x + 3, y + 2) == Cell.empty
@@ -136,6 +134,8 @@ public class MapState implements IMap {
     }
     
     public void setTankBlock(int x, int y) {
+        x /= 10;
+        y /= 10;
         synchronized (currentMap) {
             currentMap[x][y]     = Cell.tank;    currentMap[x + 1][y]     = Cell.tank;    currentMap[x + 2][y]     = Cell.tank;    currentMap[x + 3][y]     = Cell.tank;
             currentMap[x][y + 1] = Cell.tank;    currentMap[x + 1][y + 1] = Cell.tank;    currentMap[x + 2][y + 1] = Cell.tank;    currentMap[x + 3][y + 1] = Cell.tank;
@@ -174,12 +174,14 @@ public class MapState implements IMap {
         if (x >= tankXCell && x <= tankXCell + 3 && y >= tankYCell && y <= tankYCell + 3
             || x1 >= tankXCell && x1 <= tankXCell + 3 && y1 >= tankYCell && y1 <= tankYCell + 3) {
             removeTankBlock(tankXCell, tankYCell);
-            you.setOrientation(null);
-            setGameOver(true);
+            setGameOver(true);  //FIXME
         }
     }
 
-    public void startGame() {
+    public void startGame(int id) {
+        you = TanksFactory.getYou(id == 1 ? PlayerPosition.FIRST : PlayerPosition.SECOND, this);
+        friend = TanksFactory.getFriend(id == 1 ? PlayerPosition.SECOND : PlayerPosition.FIRST, this);
+
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventsDispatcher);
         enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 40);
         projectilesTimer.schedule(new ProjectilesTimerTask(this), 0, 10);

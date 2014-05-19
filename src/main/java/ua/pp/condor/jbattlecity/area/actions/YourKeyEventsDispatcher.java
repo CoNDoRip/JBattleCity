@@ -6,7 +6,7 @@ import ua.pp.condor.jbattlecity.area.MapState;
 import ua.pp.condor.jbattlecity.network.Protocol;
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
-import ua.pp.condor.jbattlecity.tank.YouTankState;
+import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.utils.Sound;
 
 import java.awt.KeyEventDispatcher;
@@ -41,7 +41,7 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
         if (arg0.getID() == KeyEvent.KEY_PRESSED) {
             final int delta = 10;
 
-            YouTankState you = mapState.getYou();
+            TankState you = mapState.getYou();
 
             int tankX = you.getX();
             int tankY = you.getY();
@@ -202,7 +202,7 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
         return false;
     }
 
-    private void changeOrientation(YouTankState you, Orientation orientation) {
+    private void changeOrientation(TankState you, Orientation orientation) {
         if (you.getOrientation() != orientation) {
             you.setOrientation(orientation);
             orientationBuf[2] = (byte) orientation.ordinal();

@@ -3,7 +3,6 @@ package ua.pp.condor.jbattlecity.area.actions;
 import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.Cell;
 import ua.pp.condor.jbattlecity.area.MapState;
-import ua.pp.condor.jbattlecity.tank.EnemyTankState;
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
@@ -26,7 +25,7 @@ public class EnemiesTimerTask extends TimerTask {
 
     @Override
     public void run() {
-        Collection<EnemyTankState> enemies = mapState.getEnemies();
+        Collection<TankState> enemies = mapState.getEnemies();
         if (enemies.size() < 3) {
             mapState.addEnemy();
         }
