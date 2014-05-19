@@ -2,9 +2,9 @@ package ua.pp.condor.jbattlecity;
 
 import org.apache.log4j.Logger;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class GameJob extends Thread {
@@ -15,10 +15,12 @@ public class GameJob extends Thread {
     private final Socket secondPlayer;
 
     private InputStream fIn;
-    private BufferedOutputStream fOut;
+    private OutputStream fOut;
+    private InputReader fReader;
 
     private InputStream sIn;
-    private BufferedOutputStream sOut;
+    private OutputStream sOut;
+    private InputReader sReader;
 
     public GameJob(Socket firstPlayer, Socket secondPlayer) {
         this.firstPlayer = firstPlayer;
@@ -26,9 +28,12 @@ public class GameJob extends Thread {
 
         try {
             fIn = firstPlayer.getInputStream();
-            fOut = new BufferedOutputStream(firstPlayer.getOutputStream());
+            fOut = firstPlayer.getOutputStream();
+            fReader = new InputReader(fIn, 1);
+
             sIn = secondPlayer.getInputStream();
-            sOut = new BufferedOutputStream(secondPlayer.getOutputStream());
+            sOut = secondPlayer.getOutputStream();
+            sReader = new InputReader(sIn, 2);
         } catch (IOException e) {
             logger.error("Can not get input of output stream of one of players", e);
             interrupt();
@@ -41,11 +46,8 @@ public class GameJob extends Thread {
         //TODO Auto-generated method stub
         try {
             sendToBoth(Protocol.START_GAME);
-            for (;;) {
-                if (firstPlayer.isClosed() || secondPlayer.isClosed()) {
-                    interrupt();
-                }
-            }
+            fReader.start();
+            sReader.start();
         } catch (IOException e) {
             logger.error("Problems with socket", e);
         }
@@ -60,10 +62,6 @@ public class GameJob extends Thread {
 
     @Override
     protected void finalize() throws Throwable {
-        fIn.close();
-        fOut.close();
-        sIn.close();
-        sOut.close();
         firstPlayer.close();
         secondPlayer.close();
         super.finalize();
