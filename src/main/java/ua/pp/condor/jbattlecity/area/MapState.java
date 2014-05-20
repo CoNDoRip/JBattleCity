@@ -1,8 +1,10 @@
 package ua.pp.condor.jbattlecity.area;
 
+import ua.pp.condor.jbattlecity.area.actions.EnemiesTimerTask;
 import ua.pp.condor.jbattlecity.area.actions.ProjectilesTimerTask;
 import ua.pp.condor.jbattlecity.area.actions.YourKeyEventsDispatcher;
 import ua.pp.condor.jbattlecity.area.maps.IMap;
+import ua.pp.condor.jbattlecity.network.Protocol;
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
@@ -14,6 +16,7 @@ import ua.pp.condor.jbattlecity.utils.Sound;
 import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
@@ -54,6 +57,8 @@ public class MapState implements IMap {
     private boolean gameOver;
 
     private OutputStream out;
+
+    private final byte[] addEnemyBuf;
     
     public MapState(IMap map) {
         this.map = map;
@@ -66,6 +71,9 @@ public class MapState implements IMap {
         projectiles = new ConcurrentHashMap<Integer, ProjectileState>();
         enemyId = 0;
         projectileId = 0;
+        addEnemyBuf = new byte[Protocol.BUF_SIZE];
+        addEnemyBuf[0] = Protocol.ENEMY;
+        addEnemyBuf[1] = Protocol.ADD;
         
         yourKeyEventsDispatcher = new YourKeyEventsDispatcher(this);
         enemiesTimer = new Timer();
@@ -131,19 +139,31 @@ public class MapState implements IMap {
     public Collection<TankState> getEnemies() {
         return enemies.values();
     }
+
+    public Map<Integer, TankState> getEnemiesMap() {
+        return enemies;
+    }
     
     public boolean addEnemy() {
+        if (enemyId > Constants.MAX_ENEMY_ID) return false;
+
+        TankState enemy = null;
         if (isEmptyBlock(EnemyPosition.SECOND.getX(), EnemyPosition.SECOND.getY())) {
-            TankState enemy = TanksFactory.getEnemy(EnemyPosition.SECOND, this);
-            enemies.put(enemyId++, enemy);
-            return true;
+            enemy = TanksFactory.getEnemy(EnemyPosition.SECOND, this);
         } else if (isEmptyBlock(EnemyPosition.FIRST.getX(), EnemyPosition.FIRST.getY())) {
-            TankState enemy = TanksFactory.getEnemy(EnemyPosition.FIRST, this);
-            enemies.put(enemyId++, enemy);
-            return true;
+            enemy = TanksFactory.getEnemy(EnemyPosition.FIRST, this);
         } else if (isEmptyBlock(EnemyPosition.THIRD.getX(), EnemyPosition.THIRD.getY())) {
-            TankState enemy = TanksFactory.getEnemy(EnemyPosition.THIRD, this);
-            enemies.put(enemyId++, enemy);
+            enemy = TanksFactory.getEnemy(EnemyPosition.THIRD, this);
+        }
+
+        if (enemy != null) {
+            enemies.put(enemyId, enemy);
+            addEnemyBuf[1] = (byte) enemyId++;
+            try {
+                out.write(addEnemyBuf);
+            } catch (IOException e) {
+                System.out.println("Can not send info to server from MapState.addEnemy(): " + e.getMessage());
+            }
             return true;
         }
         return false;
@@ -265,8 +285,10 @@ public class MapState implements IMap {
         friend = TanksFactory.getFriend(id == 1 ? PlayerPosition.SECOND : PlayerPosition.FIRST, this);
 
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventsDispatcher);
-//        enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 40);  FIXME
         projectilesTimer.schedule(new ProjectilesTimerTask(this), 0, 10);
+        if (id == 1) {
+//            enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 40);
+        }
     }
 
     public boolean isGameOver() {
@@ -275,11 +297,19 @@ public class MapState implements IMap {
 
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventsDispatcher);
-        enemiesTimer.cancel();
-        projectilesTimer.cancel();
-        Sound.getBackground().stop();
-        Sound.getGameOver().play();
+        if (gameOver) {
+            try {
+                out.write(Protocol.GAME_OVER_BUF);
+            } catch (IOException e) {
+                System.out.println("Can not send info to server from MapState.setGameOver(): " + e.getMessage());
+            }
+
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventsDispatcher);
+            enemiesTimer.cancel();
+            projectilesTimer.cancel();
+            Sound.getBackground().stop();
+            Sound.getGameOver().play();
+        }
     }
 
     public Cell[][] getCurrentMap() {
@@ -292,6 +322,10 @@ public class MapState implements IMap {
 
     public OutputStream getOut() {
         return out;
+    }
+
+    public int getEnemyId() {
+        return enemyId;
     }
 
 }

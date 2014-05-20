@@ -4,59 +4,33 @@ import ua.pp.condor.jbattlecity.JBattleCity;
 import ua.pp.condor.jbattlecity.area.Cell;
 import ua.pp.condor.jbattlecity.area.Constants;
 import ua.pp.condor.jbattlecity.area.MapState;
-import ua.pp.condor.jbattlecity.network.Protocol;
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.TankState;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Map;
+import java.util.Collection;
 import java.util.Random;
-import java.util.Set;
 import java.util.TimerTask;
 
-public class EnemiesTimerTask extends TimerTask {
+public class EnemiesTimerTaskPassive extends TimerTask {
 
     private final MapState mapState;
 
-    private final byte[] orientationBuf;
-    private final byte[] movingBuf;
-    private final byte[] shootingBuf;
-
-    private boolean changeOrientation;
-    private boolean changePlace;
-    private boolean doneShooting;
-
-    public EnemiesTimerTask(MapState mapState) {
+    public EnemiesTimerTaskPassive(MapState mapState) {
         this.mapState = mapState;
-
-        orientationBuf = new byte[Protocol.BUF_SIZE];
-        orientationBuf[2] = Protocol.ORIENTATION;
-        movingBuf = new byte[Protocol.BUF_SIZE];
-        movingBuf[2] = Protocol.MOVING;
-        shootingBuf = new byte[Protocol.BUF_SIZE];
-        shootingBuf[2] = Protocol.SHOOTING;
-        orientationBuf[0] = movingBuf[0] = shootingBuf[0] = Protocol.ENEMY;
     }
 
     Random rand = new Random();
 
     @Override
     public void run() {
-        Map<Integer, TankState> enemiesMap = mapState.getEnemiesMap();
-        if (mapState.getEnemyId() > Constants.MAX_ENEMY_ID && enemiesMap.isEmpty()) {
-            mapState.setGameOver(true);
-        } else if (enemiesMap.size() < 3) {
+        Collection<TankState> enemies = mapState.getEnemies();
+        if (enemies.size() < 3) {
             mapState.addEnemy();
         }
 
-
         final int delta = Constants.TANK_STEP;
 
-        Set<Integer> enemyIds = enemiesMap.keySet();
-        for (Integer enemyId : enemyIds) {
-            final TankState enemy = enemiesMap.get(enemyId);
-
+        for (TankState enemy : enemies) {
             int tankX = enemy.getX();
             int tankY = enemy.getY();
 
@@ -67,9 +41,7 @@ public class EnemiesTimerTask extends TimerTask {
             int incYCell = (tankY + delta) / 10;
             int decYCell = (tankY - delta) / 10;
 
-            changeOrientation = changePlace = doneShooting = false;
-            orientationBuf[1] = movingBuf[1] = shootingBuf[1] = enemyId.byteValue();
-
+            boolean moved = false;
             switch (enemy.getOrientation()) {
                 case UP: {
                     if (tankY - delta >= 0
@@ -79,7 +51,8 @@ public class EnemiesTimerTask extends TimerTask {
                             && mapState.getCell(oldXCell + 3, decYCell) == Cell.empty) {
                         tankY -= delta;
 
-                        doMoving(tankX, tankY, Orientation.UP);
+                        mapState.moveTankBlock(tankX, tankY, Orientation.UP);
+                        moved = true;
                     }
                     break;
                 }
@@ -91,7 +64,8 @@ public class EnemiesTimerTask extends TimerTask {
                             && mapState.getCell(incXCell + 3, oldYCell + 3) == Cell.empty) {
                         tankX += delta;
 
-                        doMoving(tankX, tankY, Orientation.RIGHT);
+                        mapState.moveTankBlock(tankX, tankY, Orientation.RIGHT);
+                        moved = true;
                     }
                     break;
                 }
@@ -103,7 +77,8 @@ public class EnemiesTimerTask extends TimerTask {
                             && mapState.getCell(oldXCell + 3, incYCell + 3) == Cell.empty) {
                         tankY += delta;
 
-                        doMoving(tankX, tankY, Orientation.DOWN);
+                        mapState.moveTankBlock(tankX, tankY, Orientation.DOWN);
+                        moved = true;
                     }
                     break;
                 }
@@ -115,56 +90,24 @@ public class EnemiesTimerTask extends TimerTask {
                             && mapState.getCell(decXCell, oldYCell + 3) == Cell.empty) {
                         tankX -= delta;
 
-                        doMoving(tankX, tankY, Orientation.LEFT);
+                        mapState.moveTankBlock(tankX, tankY, Orientation.LEFT);
+                        moved = true;
                     }
                     break;
                 }
             }
 
-            if (!changePlace) {
+            if (!moved) {
                 int desision = rand.nextInt(8);
                 if (desision < 4) {
-                    changeOrientation(enemy, Orientation.values()[desision]);
+                    enemy.setOrientation(Orientation.values()[desision]);
                 } else if (!enemy.isHasProjectile()) {
                     mapState.addProjectile(enemy);
-                    doShooting(enemy.getOrientation());
                 }
             }
 
             enemy.setX(tankX);
             enemy.setY(tankY);
-
-            try {
-                OutputStream out = mapState.getOut();
-                if (changeOrientation)
-                    out.write(orientationBuf);
-                if (changePlace)
-                    out.write(movingBuf);
-                if (doneShooting)
-                    out.write(shootingBuf);
-            } catch (IOException e) {
-                System.out.println("Can not send info to server from EnemiesTimerTask: " + e.getMessage());
-            }
         }
     }
-
-    private void changeOrientation(TankState tank, Orientation orientation) {
-        if (tank.getOrientation() != orientation) {
-            tank.setOrientation(orientation);
-            orientationBuf[3] = (byte) orientation.ordinal();
-            changeOrientation = true;
-        }
-    }
-
-    private void doMoving(int tankX, int tankY, Orientation orientation) {
-        mapState.moveTankBlock(tankX, tankY, orientation);
-        movingBuf[3] = (byte) orientation.ordinal();
-        changePlace = true;
-    }
-
-    private void doShooting(Orientation orientation) {
-        shootingBuf[3] = (byte) orientation.ordinal();
-        doneShooting = true;
-    }
-
 }
