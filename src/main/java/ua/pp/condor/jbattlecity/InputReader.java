@@ -25,7 +25,7 @@ public class InputReader extends Thread {
     public void run() {
         logger.debug("started with id = " + playerId);
         int count;
-        byte[] buff = new byte[10];
+        byte[] buff = new byte[Protocol.BUF_SIZE];
         try {
             while ((count = in.read(buff)) >= 0) {
                 logger.debug("Readed " + count + " bytes from "
