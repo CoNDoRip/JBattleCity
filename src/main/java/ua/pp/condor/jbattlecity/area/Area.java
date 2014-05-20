@@ -25,8 +25,8 @@ public class Area extends JPanel {
 
     private static final long serialVersionUID = -2993932675117489481L;
 
-    private BufferedInputStream in;
-    private OutputStream out;
+    private final BufferedInputStream in;
+    private final OutputStream out;
     
     private final MapState mapState;
     
@@ -68,7 +68,9 @@ public class Area extends JPanel {
         mt.addImage(Images.getGameOver(), 9);
         try {
             mt.waitForAll();
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+            System.out.println("Can not wait images: " + e);
+        }
         if (mt.isErrorAny())
             throw new IllegalStateException("Errors in images loading");
 
@@ -76,11 +78,12 @@ public class Area extends JPanel {
         int count = in.read(buf);
         if (count == 2 && buf[0] == Protocol.START_GAME) {
             Sound.getGameStart().play();
-            new InputReader(in, mapState).start();
+            final InputReader ir = new InputReader(in, mapState);
             new java.util.Timer().schedule(new TimerTask() {
 
                 @Override
                 public void run() {
+                    ir.start();
                     repaintTimer.start();
                     mapState.startGame(buf[1]);
                     Sound.getBackground().loop();

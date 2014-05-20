@@ -1,6 +1,5 @@
 package ua.pp.condor.jbattlecity.area;
 
-import ua.pp.condor.jbattlecity.area.actions.EnemiesTimerTask;
 import ua.pp.condor.jbattlecity.area.actions.ProjectilesTimerTask;
 import ua.pp.condor.jbattlecity.area.actions.YourKeyEventsDispatcher;
 import ua.pp.condor.jbattlecity.area.maps.IMap;

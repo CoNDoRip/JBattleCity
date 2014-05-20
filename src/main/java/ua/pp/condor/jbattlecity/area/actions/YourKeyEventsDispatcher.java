@@ -6,7 +6,6 @@ import ua.pp.condor.jbattlecity.area.Constants;
 import ua.pp.condor.jbattlecity.area.MapState;
 import ua.pp.condor.jbattlecity.network.Protocol;
 import ua.pp.condor.jbattlecity.tank.Orientation;
-import ua.pp.condor.jbattlecity.tank.ProjectileState;
 import ua.pp.condor.jbattlecity.tank.TankState;
 import ua.pp.condor.jbattlecity.utils.Sound;
 
@@ -136,16 +135,16 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
                 if (doneShooting)
                     out.write(shootingBuf);
             } catch (IOException e) {
-                System.out.println("Can not send info to server in YourKeyEventDispatcher: " + e.getMessage());
+                System.out.println("Can not send info to server from YourKeyEventDispatcher: " + e.getMessage());
             }
         }
 
         return false;
     }
 
-    private void changeOrientation(TankState you, Orientation orientation) {
-        if (you.getOrientation() != orientation) {
-            you.setOrientation(orientation);
+    private void changeOrientation(TankState tank, Orientation orientation) {
+        if (tank.getOrientation() != orientation) {
+            tank.setOrientation(orientation);
             orientationBuf[2] = (byte) orientation.ordinal();
             changeOrientation = true;
         }
