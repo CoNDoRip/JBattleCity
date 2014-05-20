@@ -30,8 +30,13 @@ public class InputReader extends Thread {
                     int enemyId = buf[1];
                     tank = mapState.getEnemy(enemyId);
                 } else if (buf[0] == Protocol.GAME_OVER) {
-                    mapState.setGameOver(true);
-                    interrupt();
+                    try {
+                        Thread.sleep(10);
+                        mapState.setGameOver();
+                        interrupt();
+                    } catch (InterruptedException e) {
+                        System.out.println("Can not sleep in InputReader: " + e);
+                    }
                     break;
                 }
                 if (tank != null) {

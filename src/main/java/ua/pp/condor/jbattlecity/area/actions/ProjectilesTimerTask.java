@@ -85,9 +85,9 @@ public class ProjectilesTimerTask extends TimerTask {
                 projectiles.remove(projectileId);
             }
             if (mapState.getCell(x, y) == Cell.base || mapState.getCell(x1, y1) == Cell.base) {
-                mapState.setGameOver(true);
+                mapState.setGameOver();
             }
-            if (mapState.getCell(x, y) == Cell.tank || mapState.getCell(x1, y1) == Cell.base) {
+            if (mapState.getCell(x, y) == Cell.tank || mapState.getCell(x1, y1) == Cell.tank) {
                 mapState.destroyTank(x, y, x1, y1);
             }
             if (mapState.getCell(x, y) == Cell.wall) {

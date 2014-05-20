@@ -38,6 +38,10 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
         orientationBuf[0] = movingBuf[0] = shootingBuf[0] = Protocol.FRIEND;
     }
 
+    public void setId(int id) {
+        orientationBuf[1] = movingBuf[1] = shootingBuf[1] = (byte) id;
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent arg0) {
         if (arg0.getID() == KeyEvent.KEY_PRESSED) {

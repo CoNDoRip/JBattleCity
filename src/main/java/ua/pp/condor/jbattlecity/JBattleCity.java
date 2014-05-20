@@ -5,6 +5,7 @@ import javax.swing.SwingUtilities;
 
 import ua.pp.condor.jbattlecity.area.Area;
 import ua.pp.condor.jbattlecity.area.maps.Stage1;
+import ua.pp.condor.jbattlecity.network.Protocol;
 import ua.pp.condor.jbattlecity.utils.Sound;
 
 import java.io.IOException;
@@ -53,6 +54,7 @@ public class JBattleCity extends JApplet {
     public void destroy() {
         try {
             if (socket != null) {
+                socket.getOutputStream().write(Protocol.GAME_OVER_BUF);
                 socket.close();
             }
         } catch (IOException e) {

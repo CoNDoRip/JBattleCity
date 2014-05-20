@@ -14,7 +14,6 @@ import ua.pp.condor.jbattlecity.tank.TanksFactory.PlayerPosition;
 import ua.pp.condor.jbattlecity.utils.Sound;
 
 import java.awt.Image;
-import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,11 +35,11 @@ public class MapState implements IMap {
     private final Cell[][] currentMap = new Cell[ARRAY_SIZE][ARRAY_SIZE];
     
     private final IMap map;
-    
+
     private TankState you;
     private TankState friend;
     
-    private final KeyEventDispatcher yourKeyEventsDispatcher;
+    private final YourKeyEventsDispatcher yourKeyEventsDispatcher;
     
     private final Map<Integer, TankState> enemies;
     
@@ -273,13 +272,31 @@ public class MapState implements IMap {
                 enemies.remove(enemyId);
             }
         }
-        int tankXCell = you.getX() / 10;
-        int tankYCell = you.getY() / 10;
-        
-        if (x >= tankXCell && x <= tankXCell + 3 && y >= tankYCell && y <= tankYCell + 3
-            || x1 >= tankXCell && x1 <= tankXCell + 3 && y1 >= tankYCell && y1 <= tankYCell + 3) {
-            removeTankBlock(tankXCell, tankYCell);
-            setGameOver(true);  //FIXME
+
+        int tankXCell;
+        int tankYCell;
+
+        if (you != null) {
+            tankXCell = you.getX() / 10;
+            tankYCell = you.getY() / 10;
+            if (x >= tankXCell && x <= tankXCell + 3 && y >= tankYCell && y <= tankYCell + 3
+                    || x1 >= tankXCell && x1 <= tankXCell + 3 && y1 >= tankYCell && y1 <= tankYCell + 3) {
+                removeTankBlock(tankXCell, tankYCell);
+                you = null;
+            }
+        }
+        if (friend != null) {
+            tankXCell = friend.getX() / 10;
+            tankYCell = friend.getY() / 10;
+            if (x >= tankXCell && x <= tankXCell + 3 && y >= tankYCell && y <= tankYCell + 3
+                    || x1 >= tankXCell && x1 <= tankXCell + 3 && y1 >= tankYCell && y1 <= tankYCell + 3) {
+                removeTankBlock(tankXCell, tankYCell);
+                friend = null;
+            }
+        }
+
+        if (you == null && friend == null) {
+            setGameOver();
         }
     }
 
@@ -287,10 +304,11 @@ public class MapState implements IMap {
         you = TanksFactory.getYou(id == 1 ? PlayerPosition.FIRST : PlayerPosition.SECOND, this);
         friend = TanksFactory.getFriend(id == 1 ? PlayerPosition.SECOND : PlayerPosition.FIRST, this);
 
+        yourKeyEventsDispatcher.setId(id);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventsDispatcher);
         projectilesTimer.schedule(new ProjectilesTimerTask(this), 0, 10);
         if (id == 1) {
-            enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 1000);
+            enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 40);
         }
     }
 
@@ -298,21 +316,21 @@ public class MapState implements IMap {
         return gameOver;
     }
 
-    public void setGameOver(boolean gameOver) {
-        this.gameOver = gameOver;
-        if (gameOver) {
+    public void setGameOver() {
+        if (!gameOver) {
             try {
                 out.write(Protocol.GAME_OVER_BUF);
             } catch (IOException e) {
                 System.out.println("Can not send info to server from MapState.setGameOver(): " + e.getMessage());
             }
-
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventsDispatcher);
-            enemiesTimer.cancel();
-            projectilesTimer.cancel();
-            Sound.getBackground().stop();
-            Sound.getGameOver().play();
         }
+        gameOver = true;
+
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(yourKeyEventsDispatcher);
+        enemiesTimer.cancel();
+        projectilesTimer.cancel();
+        Sound.getBackground().stop();
+        Sound.getGameOver().play();
     }
 
     public Cell[][] getCurrentMap() {

@@ -45,7 +45,7 @@ public class EnemiesTimerTask extends TimerTask {
     public void run() {
         Map<Integer, TankState> enemiesMap = mapState.getEnemiesMap();
         if (mapState.getEnemyId() > Constants.MAX_ENEMY_ID && enemiesMap.isEmpty()) {
-            mapState.setGameOver(true);
+            mapState.setGameOver();
         } else if (enemiesMap.size() < 3) {
             mapState.addEnemy(null);
         }
