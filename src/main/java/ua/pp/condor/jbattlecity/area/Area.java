@@ -29,6 +29,8 @@ public class Area extends JPanel {
     private final OutputStream out;
     
     private final MapState mapState;
+
+    final Timer repaintTimer;
     
     public Area(Socket socket, IMap map) throws IOException {
         in = new BufferedInputStream(socket.getInputStream());
@@ -38,7 +40,7 @@ public class Area extends JPanel {
         
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         
-        final Timer repaintTimer = new Timer(10, new ActionListener() {
+        repaintTimer = new Timer(15, new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -125,8 +127,10 @@ public class Area extends JPanel {
             g.drawImage(Images.getProjectile(), ps.getX() - Images.PROJECTILE_SIZE, ps.getY() - Images.PROJECTILE_SIZE, this);
         }
 
-        if (mapState.isGameOver())
+        if (mapState.isGameOver()) {
             g.drawImage(Images.getGameOver(), 110, 160, this);
+            repaintTimer.stop();
+        }
     }
     
 }

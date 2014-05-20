@@ -29,12 +29,12 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
     public YourKeyEventsDispatcher(MapState mapState) {
         this.mapState = mapState;
 
-        orientationBuf = new byte[3];
-        orientationBuf[1] = Protocol.ORIENTATION;
-        movingBuf = new byte[3];
-        movingBuf[1] = Protocol.MOVING;
-        shootingBuf = new byte[3];
-        shootingBuf[1] = Protocol.SHOOTING;
+        orientationBuf = new byte[Protocol.BUF_SIZE];
+        orientationBuf[2] = Protocol.ORIENTATION;
+        movingBuf = new byte[Protocol.BUF_SIZE];
+        movingBuf[2] = Protocol.MOVING;
+        shootingBuf = new byte[Protocol.BUF_SIZE];
+        shootingBuf[2] = Protocol.SHOOTING;
         orientationBuf[0] = movingBuf[0] = shootingBuf[0] = Protocol.FRIEND;
     }
 
@@ -145,18 +145,18 @@ public class YourKeyEventsDispatcher implements KeyEventDispatcher {
     private void changeOrientation(TankState tank, Orientation orientation) {
         if (tank.getOrientation() != orientation) {
             tank.setOrientation(orientation);
-            orientationBuf[2] = (byte) orientation.ordinal();
+            orientationBuf[3] = (byte) orientation.ordinal();
             changeOrientation = true;
         }
     }
 
     private void doMoving(Orientation orientation) {
-        movingBuf[2] = (byte) orientation.ordinal();
+        movingBuf[3] = (byte) orientation.ordinal();
         changePlace = true;
     }
 
     private void doShooting(Orientation orientation) {
-        shootingBuf[2] = (byte) orientation.ordinal();
+        shootingBuf[3] = (byte) orientation.ordinal();
         doneShooting = true;
     }
 

@@ -29,8 +29,8 @@ public class JBattleCity extends JApplet {
                     makeGUI();
                 }
             });
-        } catch (final Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Can not run applet: " + e);
         }
     }
 
@@ -44,6 +44,7 @@ public class JBattleCity extends JApplet {
             socket = new Socket(host, portNumber);
             add(new Area(socket, new Stage1()));
         } catch (IOException e) {
+            System.out.print("Error in socket: " + e);
             destroy();
         }
     }
@@ -51,9 +52,11 @@ public class JBattleCity extends JApplet {
     @Override
     public void destroy() {
         try {
-            socket.close();
+            if (socket != null) {
+                socket.close();
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Can not close socket: " + e);
         }
         super.destroy();
     }

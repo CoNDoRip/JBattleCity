@@ -47,7 +47,7 @@ public class EnemiesTimerTask extends TimerTask {
         if (mapState.getEnemyId() > Constants.MAX_ENEMY_ID && enemiesMap.isEmpty()) {
             mapState.setGameOver(true);
         } else if (enemiesMap.size() < 3) {
-            mapState.addEnemy();
+            mapState.addEnemy(null);
         }
 
 

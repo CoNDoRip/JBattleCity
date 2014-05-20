@@ -20,23 +20,28 @@ public class InputReader extends Thread {
 
     @Override
     public void run() {
-        int count;
-        byte[] buf = new byte[10];
+        byte[] buf = new byte[Protocol.BUF_SIZE];
         try {
-            while ((count = in.read(buf, 0, 3)) >= 0) {
-                //TODO
+            while (in.read(buf, 0, Protocol.BUF_SIZE) >= 0) {
                 TankState tank = null;
                 if (buf[0] == Protocol.FRIEND) {
                     tank = mapState.getFriend();
+                } else if (buf[0] == Protocol.ENEMY) {
+                    int enemyId = buf[1];
+                    tank = mapState.getEnemy(enemyId);
+                } else if (buf[0] == Protocol.GAME_OVER) {
+                    mapState.setGameOver(true);
+                    interrupt();
+                    break;
                 }
                 if (tank != null) {
-                    Orientation orientation = Orientation.values()[buf[2]];
-                    switch (buf[1]) {
+                    Orientation orientation = Orientation.values()[buf[3]];
+                    switch (buf[2]) {
                         case Protocol.ORIENTATION: {
                             tank.setOrientation(orientation);
                             break;
                         }
-                        case Protocol.MOVING: {
+                        case Protocol.MOVING: { //TODO refactor this
                             switch (orientation) {
                                 case UP:    {
                                     tank.setY(tank.getY() - Constants.TANK_STEP);
@@ -70,11 +75,15 @@ public class InputReader extends Thread {
                             break;
                         }
                     }
+                } else if (buf[0] == Protocol.ENEMY && buf[2] == Protocol.ADD) {
+                    int enemyId = buf[1];
+                    mapState.addEnemy(enemyId);
                 }
                 NetworkUtils.bzero(buf);
-
             }
             interrupt();
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            System.out.print("I/O Error in InputReader: " + e);
+        }
     }
 }

@@ -59,7 +59,7 @@ public class MapState implements IMap {
     private OutputStream out;
 
     private final byte[] addEnemyBuf;
-    
+
     public MapState(IMap map) {
         this.map = map;
         for (int x = 0; x < ARRAY_SIZE; x++) {
@@ -73,7 +73,7 @@ public class MapState implements IMap {
         projectileId = 0;
         addEnemyBuf = new byte[Protocol.BUF_SIZE];
         addEnemyBuf[0] = Protocol.ENEMY;
-        addEnemyBuf[1] = Protocol.ADD;
+        addEnemyBuf[2] = Protocol.ADD;
         
         yourKeyEventsDispatcher = new YourKeyEventsDispatcher(this);
         enemiesTimer = new Timer();
@@ -144,7 +144,7 @@ public class MapState implements IMap {
         return enemies;
     }
     
-    public boolean addEnemy() {
+    public boolean addEnemy(Integer newEnemyId) {
         if (enemyId > Constants.MAX_ENEMY_ID) return false;
 
         TankState enemy = null;
@@ -157,12 +157,15 @@ public class MapState implements IMap {
         }
 
         if (enemy != null) {
-            enemies.put(enemyId, enemy);
-            addEnemyBuf[1] = (byte) enemyId++;
-            try {
-                out.write(addEnemyBuf);
-            } catch (IOException e) {
-                System.out.println("Can not send info to server from MapState.addEnemy(): " + e.getMessage());
+            int id = newEnemyId != null ? newEnemyId : enemyId++;
+            enemies.put(id, enemy);
+            if (newEnemyId == null) {
+                addEnemyBuf[1] = (byte) id;
+                try {
+                    out.write(addEnemyBuf);
+                } catch (IOException e) {
+                    System.out.println("Can not send info to server from MapState.addEnemy(): " + e.getMessage());
+                }
             }
             return true;
         }
@@ -287,7 +290,7 @@ public class MapState implements IMap {
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(yourKeyEventsDispatcher);
         projectilesTimer.schedule(new ProjectilesTimerTask(this), 0, 10);
         if (id == 1) {
-//            enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 40);
+            enemiesTimer.schedule(new EnemiesTimerTask(this), 1000, 1000);
         }
     }
 
@@ -326,6 +329,10 @@ public class MapState implements IMap {
 
     public int getEnemyId() {
         return enemyId;
+    }
+
+    public TankState getEnemy(Integer enemyId) {
+        return enemies.get(enemyId);
     }
 
 }
