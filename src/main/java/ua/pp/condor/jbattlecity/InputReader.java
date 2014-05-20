@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 public class InputReader extends Thread {
