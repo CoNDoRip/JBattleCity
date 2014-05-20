@@ -24,13 +24,14 @@ public class InputReader extends Thread {
     public void run() {
         logger.debug("started with id = " + playerId);
         int count;
-        byte[] buff = new byte[Protocol.BUF_SIZE];
+        byte[] buf = new byte[Protocol.BUF_SIZE];
         try {
-            while ((count = in.read(buff)) >= 0) {
+            while ((count = in.read(buf)) >= 0) {
                 logger.debug("Readed " + count + " bytes from "
-                        + (playerId == 1 ? "first" : "second") + " player");
-                out.write(buff);
-                NetworkUtils.bzero(buff);
+                        + (playerId == 1 ? "first" : "second") + " player: "
+                        + buf[0] + "-" + buf[1] + "-" + buf[2] + "-" + buf[3]);
+                out.write(buf);
+                NetworkUtils.bzero(buf);
 
             }
             logger.debug("stoped with id = " + playerId);
