@@ -24,7 +24,7 @@ public class JBattleCityServer {
         }
 
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
-            logger.debug("successfully binded to port " + portNumber);
+            logger.info("successfully binded to port " + portNumber);
             for (;;) {
                 Socket firstPlayer = serverSocket.accept();
                 logger.info("First player connected from " + firstPlayer.getInetAddress().getHostAddress());

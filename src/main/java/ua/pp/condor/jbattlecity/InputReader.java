@@ -22,19 +22,19 @@ public class InputReader extends Thread {
 
     @Override
     public void run() {
-        logger.debug("started with id = " + playerId);
+        logger.info("started with id = " + playerId);
         int count;
         byte[] buf = new byte[Protocol.BUF_SIZE];
         try {
             while ((count = in.read(buf)) >= 0) {
-                logger.debug("Readed " + count + " bytes from "
-                        + (playerId == 1 ? "first" : "second") + " player: "
-                        + buf[0] + "-" + buf[1] + "-" + buf[2] + "-" + buf[3]);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Readed " + count + " bytes from "
+                            + (playerId == 1 ? "first" : "second") + " player: "
+                            + buf[0] + "-" + buf[1] + "-" + buf[2] + "-" + buf[3]);
+                }
                 out.write(buf);
-                NetworkUtils.bzero(buf);
-
             }
-            logger.debug("stoped with id = " + playerId);
+            logger.info("stoped with id = " + playerId);
             interrupt();
         } catch (IOException e) {
             logger.error("Player " + playerId + ": " + e);
