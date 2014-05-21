@@ -4,6 +4,7 @@ import ua.pp.condor.jbattlecity.area.Constants;
 import ua.pp.condor.jbattlecity.area.MapState;
 import ua.pp.condor.jbattlecity.tank.Orientation;
 import ua.pp.condor.jbattlecity.tank.TankState;
+import ua.pp.condor.jbattlecity.tank.TanksFactory.EnemyPosition;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -22,21 +23,21 @@ public class InputReader extends Thread {
     public void run() {
         byte[] buf = new byte[Protocol.BUF_SIZE];
         try {
-            while (in.read(buf, 0, Protocol.BUF_SIZE) >= 0) {
+            while (in.read(buf) >= 0) {
                 TankState tank = null;
                 if (buf[0] == Protocol.FRIEND) {
                     tank = mapState.getFriend();
                 } else if (buf[0] == Protocol.ENEMY) {
                     int enemyId = buf[1];
-                    tank = mapState.getEnemy(enemyId);
-                } else if (buf[0] == Protocol.GAME_OVER) {
-                    try {
-                        Thread.sleep(10);
-                        mapState.setGameOver();
-                        interrupt();
-                    } catch (InterruptedException e) {
-                        System.out.println("Can not sleep in InputReader: " + e);
+                    if (buf[2] == Protocol.ADD) {
+                        EnemyPosition position = EnemyPosition.values()[buf[3]];
+                        mapState.addEnemy(enemyId, position);
+                    } else {
+                        tank = mapState.getEnemy(enemyId);
                     }
+                } else if (buf[0] == Protocol.GAME_OVER) {
+                    mapState.setGameOver();
+                    interrupt();
                     break;
                 }
                 if (tank != null) {
@@ -80,9 +81,6 @@ public class InputReader extends Thread {
                             break;
                         }
                     }
-                } else if (buf[0] == Protocol.ENEMY && buf[2] == Protocol.ADD) {
-                    int enemyId = buf[1];
-                    mapState.addEnemy(enemyId);
                 }
                 NetworkUtils.bzero(buf);
             }

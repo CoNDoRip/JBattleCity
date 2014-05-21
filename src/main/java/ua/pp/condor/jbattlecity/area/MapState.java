@@ -142,24 +142,31 @@ public class MapState implements IMap {
     public Map<Integer, TankState> getEnemiesMap() {
         return enemies;
     }
+
+    public boolean addEnemy() {
+        return addEnemy(null, null);
+    }
     
-    public boolean addEnemy(Integer newEnemyId) {
+    public boolean addEnemy(Integer newEnemyId, EnemyPosition newPosition) {
         if (enemyId > Constants.MAX_ENEMY_ID) return false;
 
-        TankState enemy = null;
-        if (isEmptyBlock(EnemyPosition.SECOND.getX(), EnemyPosition.SECOND.getY())) {
-            enemy = TanksFactory.getEnemy(EnemyPosition.SECOND, this);
-        } else if (isEmptyBlock(EnemyPosition.FIRST.getX(), EnemyPosition.FIRST.getY())) {
-            enemy = TanksFactory.getEnemy(EnemyPosition.FIRST, this);
-        } else if (isEmptyBlock(EnemyPosition.THIRD.getX(), EnemyPosition.THIRD.getY())) {
-            enemy = TanksFactory.getEnemy(EnemyPosition.THIRD, this);
+        if (newPosition == null) {
+            if (isEmptyBlock(EnemyPosition.SECOND.getX(), EnemyPosition.SECOND.getY())) {
+                newPosition = EnemyPosition.SECOND;
+            } else if (isEmptyBlock(EnemyPosition.FIRST.getX(), EnemyPosition.FIRST.getY())) {
+                newPosition = EnemyPosition.FIRST;
+            } else if (isEmptyBlock(EnemyPosition.THIRD.getX(), EnemyPosition.THIRD.getY())) {
+                newPosition = EnemyPosition.THIRD;
+            }
         }
 
-        if (enemy != null) {
+        if (newPosition != null) {
+            TankState enemy = TanksFactory.getEnemy(newPosition, this);
             int id = newEnemyId != null ? newEnemyId : enemyId++;
             enemies.put(id, enemy);
             if (newEnemyId == null) {
                 addEnemyBuf[1] = (byte) id;
+                addEnemyBuf[3] = (byte) newPosition.ordinal();
                 try {
                     out.write(addEnemyBuf);
                 } catch (IOException e) {

@@ -40,7 +40,7 @@ public class Area extends JPanel {
         
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         
-        repaintTimer = new Timer(15, new ActionListener() {
+        repaintTimer = new Timer(40, new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {
